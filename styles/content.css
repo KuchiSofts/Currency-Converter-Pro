@@ -1,0 +1,723 @@
+/* Content script styles for currency conversion tooltip */
+
+:root {
+  --tooltip-primary: #3b82f6;
+  --tooltip-primary-light: rgba(59, 130, 246, 0.1);
+  --tooltip-gradient-start: #3b82f6;
+  --tooltip-gradient-end: #2563eb;
+
+  /* Tooltip-specific colors */
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #e0e0e0;
+  --tooltip-text: #333333;
+  --tooltip-text-secondary: #666666;
+  --tooltip-secondary-bg: #f8f9fa;
+  --tooltip-divider: #e9ecef;
+}
+
+.currency-converter-tooltip {
+  background: var(--tooltip-bg);
+  border: 1px solid var(--tooltip-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  min-width: 280px;
+  max-width: 400px;
+  animation: fadeInUp 0.3s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.conversion-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--tooltip-gradient-start) 0%, var(--tooltip-gradient-end) 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+}
+
+.conversion-icon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.conversion-title {
+  font-weight: 600;
+  flex: 1;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.conversion-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 12px;
+}
+
+.conversion-from,
+.conversion-to {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.conversion-from .amount,
+.conversion-to .amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tooltip-text);
+}
+
+.conversion-to .amount.highlight {
+  color: var(--tooltip-primary);
+}
+
+.conversion-from .currency,
+.conversion-to .currency {
+  font-size: 12px;
+  color: var(--tooltip-text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.conversion-arrow {
+  font-size: 16px;
+  color: var(--tooltip-primary);
+  font-weight: bold;
+}
+
+.conversion-rate {
+  padding: 12px 16px;
+  background: var(--tooltip-secondary-bg);
+  border-radius: 0 0 12px 12px;
+  font-size: 12px;
+  color: var(--tooltip-text-secondary);
+  text-align: center;
+  border-top: 1px solid var(--tooltip-divider);
+}
+
+/* Highlight detectable prices */
+.has-detectable-price {
+  position: relative;
+  cursor: pointer;
+  border-bottom: 1px dotted var(--tooltip-primary);
+  transition: all 0.2s ease;
+}
+
+.has-detectable-price:hover {
+  background-color: var(--tooltip-primary-light);
+  border-bottom: 2px solid var(--tooltip-primary);
+}
+
+.has-detectable-price:hover::after {
+  content: "💱";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 10px;
+  background: var(--tooltip-primary);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  animation: bounceIn 0.3s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+/* Hover tooltip styles */
+.currency-converter-hover-tooltip {
+  background: linear-gradient(135deg, var(--tooltip-gradient-start) 0%, var(--tooltip-gradient-end) 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: fadeInUp 0.2s ease-out;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.hover-conversion-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hover-conversion-content .original {
+  opacity: 0.9;
+}
+
+.hover-conversion-content .arrow {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.hover-conversion-content .converted {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Enhanced tooltip for converted prices */
+[data-currency-converted="true"] {
+  border-bottom: 1px dotted var(--tooltip-primary);
+  cursor: help;
+}
+
+/* ========================================
+   ACCESSIBILITY FEATURES
+   ======================================== */
+
+/* High Contrast Mode */
+body.cc-high-contrast .currency-converter-custom-tooltip {
+  border-width: 3px !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.9), 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+  filter: contrast(1.3) !important;
+}
+
+body.cc-high-contrast [data-currency-converted="true"] {
+  border-bottom-width: 2px !important;
+  border-bottom-style: solid !important;
+}
+
+/* Large Text Mode */
+body.cc-large-text .currency-converter-custom-tooltip {
+  font-size: 125% !important;
+  padding: 12px 18px !important;
+}
+
+body.cc-large-text .conversion-result,
+body.cc-large-text .conversion-rate {
+  font-size: 125% !important;
+}
+
+/* Reduced Motion */
+body.cc-reduced-motion .currency-converter-custom-tooltip {
+  transition: none !important;
+  animation: none !important;
+}
+
+body.cc-reduced-motion .fadeInUp,
+body.cc-reduced-motion .hover-conversion {
+  animation: none !important;
+  transition: none !important;
+}
+
+body.cc-reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Screen Reader Mode */
+body.cc-screen-reader .currency-converter-custom-tooltip {
+  /* Tooltips will have proper ARIA labels added via JS */
+}
+
+body.cc-screen-reader .currency-converter-custom-tooltip::before {
+  content: 'Converted price: ';
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Debug Mode - Show detection highlights */
+body.cc-debug-mode [data-currency-detected="true"] {
+  outline: 2px dashed #ff6b6b !important;
+  outline-offset: 2px !important;
+  background-color: rgba(255, 107, 107, 0.1) !important;
+}
+
+body.cc-debug-mode [data-currency-converted="true"] {
+  outline: 2px solid #51cf66 !important;
+  outline-offset: 2px !important;
+  background-color: rgba(81, 207, 102, 0.1) !important;
+}
+
+/* Compact Tooltip Mode - handled inline in JS but additional support */
+.currency-converter-custom-tooltip.cc-compact {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  .currency-converter-tooltip {
+    min-width: 240px;
+    max-width: calc(100vw - 40px);
+    font-size: 13px;
+  }
+
+  .conversion-content {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .conversion-from .amount,
+  .conversion-to .amount {
+    font-size: 16px;
+  }
+
+  .conversion-header {
+    padding: 10px 14px;
+  }
+
+  .close-btn {
+    min-width: 32px;
+    min-height: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .currency-converter-tooltip {
+    min-width: 200px;
+    max-width: calc(100vw - 30px);
+    font-size: 12px;
+  }
+
+  .conversion-content {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .conversion-from .amount,
+  .conversion-to .amount {
+    font-size: 14px;
+  }
+
+  .conversion-header {
+    padding: 8px 12px;
+  }
+
+  .conversion-rate {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .has-detectable-price:hover::after {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .has-detectable-price {
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+
+  .has-detectable-price:hover::after {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+
+  .currency-converter-hover-tooltip {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Landscape on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .currency-converter-tooltip {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .currency-converter-tooltip {
+    border-width: 0.5px;
+  }
+
+  .has-detectable-price {
+    border-bottom-width: 0.5px;
+  }
+
+  .has-detectable-price:hover {
+    border-bottom-width: 1px;
+  }
+}
+
+/* ========================================
+   CHROME DARK MODE - TOOLTIP OVERRIDES
+   Matching Chrome Browser Dark Mode
+   ======================================== */
+
+[data-theme="chrome-dark"] {
+  --tooltip-primary: #8ab4f8;
+  --tooltip-primary-light: rgba(138, 180, 248, 0.1);
+  --tooltip-gradient-start: #202124;
+  --tooltip-gradient-end: #292a2d;
+}
+
+[data-theme="chrome-dark"] .currency-converter-tooltip {
+  background: #292a2d !important;
+  border: 1px solid #3c4043 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="chrome-dark"] .conversion-header {
+  background: #202124 !important;
+  background-image: none !important;
+  color: #e8eaed !important;
+  border-bottom: 1px solid #3c4043 !important;
+}
+
+[data-theme="chrome-dark"] .conversion-title {
+  color: #e8eaed !important;
+}
+
+[data-theme="chrome-dark"] .close-btn {
+  background: rgba(60, 64, 67, 0.5) !important;
+  color: #e8eaed !important;
+}
+
+[data-theme="chrome-dark"] .close-btn:hover {
+  background: rgba(95, 99, 104, 0.8) !important;
+}
+
+[data-theme="chrome-dark"] .conversion-content {
+  background: #292a2d !important;
+}
+
+[data-theme="chrome-dark"] .conversion-from .amount,
+[data-theme="chrome-dark"] .conversion-to .amount {
+  color: #e8eaed !important;
+}
+
+[data-theme="chrome-dark"] .conversion-to .amount.highlight {
+  color: #8ab4f8 !important;
+}
+
+[data-theme="chrome-dark"] .conversion-from .currency,
+[data-theme="chrome-dark"] .conversion-to .currency {
+  color: #9aa0a6 !important;
+}
+
+[data-theme="chrome-dark"] .conversion-arrow {
+  color: #8ab4f8 !important;
+}
+
+[data-theme="chrome-dark"] .conversion-rate {
+  background: #202124 !important;
+  color: #9aa0a6 !important;
+  border-top: 1px solid #3c4043 !important;
+}
+
+/* Highlight detectable prices */
+[data-theme="chrome-dark"] .has-detectable-price {
+  border-bottom-color: #8ab4f8 !important;
+}
+
+[data-theme="chrome-dark"] .has-detectable-price:hover {
+  background-color: rgba(138, 180, 248, 0.1) !important;
+  border-bottom-color: #8ab4f8 !important;
+}
+
+[data-theme="chrome-dark"] .has-detectable-price:hover::after {
+  background: #8ab4f8 !important;
+  color: #000000 !important;
+}
+
+/* Hover tooltip */
+[data-theme="chrome-dark"] .currency-converter-hover-tooltip {
+  background: #3c4043 !important;
+  background-image: none !important;
+  color: #e8eaed !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="chrome-dark"] .hover-conversion-content .original {
+  color: #e8eaed !important;
+  opacity: 0.9;
+}
+
+[data-theme="chrome-dark"] .hover-conversion-content .converted {
+  color: #8ab4f8 !important;
+  font-weight: 700;
+}
+
+/* Enhanced tooltip for converted prices */
+[data-theme="chrome-dark"] [data-currency-converted="true"] {
+  border-bottom-color: #8ab4f8 !important;
+}
+
+/* Accessibility - High Contrast Mode for Chrome Dark */
+body.cc-high-contrast[data-theme="chrome-dark"] .currency-converter-custom-tooltip {
+  border: 3px solid #8ab4f8 !important;
+  box-shadow: 0 0 0 4px rgba(138, 180, 248, 0.3), 0 12px 40px rgba(0, 0, 0, 0.9) !important;
+}
+
+body.cc-high-contrast[data-theme="chrome-dark"] [data-currency-converted="true"] {
+  border-bottom-width: 2px !important;
+  border-bottom-color: #8ab4f8 !important;
+}
+
+/* Debug Mode for Chrome Dark */
+body.cc-debug-mode[data-theme="chrome-dark"] [data-currency-detected="true"] {
+  outline-color: #f28b82 !important;
+  background-color: rgba(242, 139, 130, 0.1) !important;
+}
+
+body.cc-debug-mode[data-theme="chrome-dark"] [data-currency-converted="true"] {
+  outline-color: #81c995 !important;
+  background-color: rgba(129, 201, 149, 0.1) !important;
+}
+
+/* ========================================
+   ALL THEME TOOLTIP OVERRIDES
+   ======================================== */
+
+/* Professional Theme - Corporate Blue */
+[data-theme="professional"] {
+  --tooltip-primary: #2563eb;
+  --tooltip-primary-light: rgba(37, 99, 235, 0.1);
+  --tooltip-gradient-start: #1e40af;
+  --tooltip-gradient-end: #3b82f6;
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #cbd5e1;
+  --tooltip-text: #0f172a;
+  --tooltip-text-secondary: #475569;
+  --tooltip-secondary-bg: #f8fafc;
+  --tooltip-divider: #e2e8f0;
+}
+
+/* Minimal Theme - Clean Gray */
+[data-theme="minimal"] {
+  --tooltip-primary: #374151;
+  --tooltip-primary-light: rgba(55, 65, 81, 0.1);
+  --tooltip-gradient-start: #374151;
+  --tooltip-gradient-end: #6b7280;
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #d1d5db;
+  --tooltip-text: #111827;
+  --tooltip-text-secondary: #6b7280;
+  --tooltip-secondary-bg: #f9fafb;
+  --tooltip-divider: #e5e7eb;
+}
+
+/* Vibrant Theme - Warm Colors */
+[data-theme="vibrant"] {
+  --tooltip-primary: #f59e0b;
+  --tooltip-primary-light: rgba(245, 158, 11, 0.1);
+  --tooltip-gradient-start: #f59e0b;
+  --tooltip-gradient-end: #ef4444;
+  --tooltip-bg: #fffbeb;
+  --tooltip-border: #fcd34d;
+  --tooltip-text: #92400e;
+  --tooltip-text-secondary: #b45309;
+  --tooltip-secondary-bg: #fef3c7;
+  --tooltip-divider: #fde68a;
+}
+
+/* Ocean Theme - Teal & Aqua */
+[data-theme="ocean"] {
+  --tooltip-primary: #0891b2;
+  --tooltip-primary-light: rgba(8, 145, 178, 0.1);
+  --tooltip-gradient-start: #0891b2;
+  --tooltip-gradient-end: #06b6d4;
+  --tooltip-bg: #f0fdfa;
+  --tooltip-border: #5eead4;
+  --tooltip-text: #164e63;
+  --tooltip-text-secondary: #0e7490;
+  --tooltip-secondary-bg: #ccfbf1;
+  --tooltip-divider: #99f6e4;
+}
+
+/* Sunset Theme - Purple & Pink */
+[data-theme="sunset"] {
+  --tooltip-primary: #a855f7;
+  --tooltip-primary-light: rgba(168, 85, 247, 0.1);
+  --tooltip-gradient-start: #9333ea;
+  --tooltip-gradient-end: #c026d3;
+  --tooltip-bg: #fdf4ff;
+  --tooltip-border: #d8b4fe;
+  --tooltip-text: #581c87;
+  --tooltip-text-secondary: #7e22ce;
+  --tooltip-secondary-bg: #f3e8ff;
+  --tooltip-divider: #e9d5ff;
+}
+
+/* Forest Theme - Green & Nature */
+[data-theme="forest"] {
+  --tooltip-primary: #059669;
+  --tooltip-primary-light: rgba(5, 150, 105, 0.1);
+  --tooltip-gradient-start: #059669;
+  --tooltip-gradient-end: #10b981;
+  --tooltip-bg: #f0fdf4;
+  --tooltip-border: #86efac;
+  --tooltip-text: #064e3b;
+  --tooltip-text-secondary: #047857;
+  --tooltip-secondary-bg: #dcfce7;
+  --tooltip-divider: #bbf7d0;
+}
+
+/* Midnight Theme - Deep Blue */
+[data-theme="midnight"] {
+  --tooltip-primary: #1d4ed8;
+  --tooltip-primary-light: rgba(29, 78, 216, 0.1);
+  --tooltip-gradient-start: #1e3a8a;
+  --tooltip-gradient-end: #3b82f6;
+  --tooltip-bg: #eff6ff;
+  --tooltip-border: #60a5fa;
+  --tooltip-text: #1e3a8a;
+  --tooltip-text-secondary: #1e40af;
+  --tooltip-secondary-bg: #dbeafe;
+  --tooltip-divider: #93c5fd;
+}
+
+/* Cherry Theme - Red & Rose */
+[data-theme="cherry"] {
+  --tooltip-primary: #e11d48;
+  --tooltip-primary-light: rgba(225, 29, 72, 0.1);
+  --tooltip-gradient-start: #dc2626;
+  --tooltip-gradient-end: #f43f5e;
+  --tooltip-bg: #fff1f2;
+  --tooltip-border: #fda4af;
+  --tooltip-text: #881337;
+  --tooltip-text-secondary: #be123c;
+  --tooltip-secondary-bg: #ffe4e6;
+  --tooltip-divider: #fecdd3;
+}
+
+/* Autumn Theme - Amber & Orange */
+[data-theme="autumn"] {
+  --tooltip-primary: #d97706;
+  --tooltip-primary-light: rgba(217, 119, 6, 0.1);
+  --tooltip-gradient-start: #d97706;
+  --tooltip-gradient-end: #f59e0b;
+  --tooltip-bg: #fffbeb;
+  --tooltip-border: #fcd34d;
+  --tooltip-text: #78350f;
+  --tooltip-text-secondary: #92400e;
+  --tooltip-secondary-bg: #fef3c7;
+  --tooltip-divider: #fde68a;
+}
+
+/* Lavender Theme - Soft Purple */
+[data-theme="lavender"] {
+  --tooltip-primary: #8b5cf6;
+  --tooltip-primary-light: rgba(139, 92, 246, 0.1);
+  --tooltip-gradient-start: #7c3aed;
+  --tooltip-gradient-end: #a78bfa;
+  --tooltip-bg: #faf5ff;
+  --tooltip-border: #d8b4fe;
+  --tooltip-text: #5b21b6;
+  --tooltip-text-secondary: #6d28d9;
+  --tooltip-secondary-bg: #f3e8ff;
+  --tooltip-divider: #e9d5ff;
+}
+
+/* Monochrome Theme - High Contrast B&W */
+[data-theme="monochrome"] {
+  --tooltip-primary: #000000;
+  --tooltip-primary-light: rgba(0, 0, 0, 0.05);
+  --tooltip-gradient-start: #000000;
+  --tooltip-gradient-end: #374151;
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #9ca3af;
+  --tooltip-text: #000000;
+  --tooltip-text-secondary: #374151;
+  --tooltip-secondary-bg: #f3f4f6;
+  --tooltip-divider: #d1d5db;
+}
+
+/* Discord Dark Theme */
+[data-theme="dark"] {
+  --tooltip-primary: #5865F2;
+  --tooltip-primary-light: rgba(88, 101, 242, 0.1);
+  --tooltip-gradient-start: #36393f;
+  --tooltip-gradient-end: #2f3136;
+  --tooltip-bg: #36393f;
+  --tooltip-border: #40444b;
+  --tooltip-text: #dcddde;
+  --tooltip-text-secondary: #b9bbbe;
+  --tooltip-secondary-bg: #2f3136;
+  --tooltip-divider: #40444b;
+}
+
+[data-theme="dark"] .currency-converter-tooltip {
+  background: #36393f !important;
+  border-color: #40444b !important;
+}
+
+[data-theme="dark"] .conversion-header {
+  background: linear-gradient(135deg, #2f3136 0%, #36393f 100%) !important;
+  color: #dcddde !important;
+}
