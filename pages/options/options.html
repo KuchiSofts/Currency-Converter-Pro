@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Currency Converter Pro</title>
+  <link rel="stylesheet" href="../../styles/themes.css?version=3.0.0">
+  <link rel="stylesheet" href="../../styles/options.css?version=3.0.0">
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../../icons/icon-48.png" alt="Logo" class="sidebar-logo">
+        <div class="sidebar-brand">
+          <h1>Currency Converter Pro</h1>
+          <span class="version-tag" id="sidebarVersion">v...</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- General Settings -->
+        <div class="nav-category">GENERAL</div>
+        <a href="#appearance" class="nav-item active" data-section="appearance">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2a6 6 0 0 1 6 6c0 3-2 5-2 7H6c0-2-2-4-2-7a6 6 0 0 1 6-6z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 15h4M9 18h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Appearance</span>
+        </a>
+        <a href="#currency" class="nav-item" data-section="currency">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 6v8M7 8h4a1.5 1.5 0 0 1 0 3h-4a1.5 1.5 0 0 0 0 3h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Currency</span>
+        </a>
+
+        <!-- Display Options -->
+        <div class="nav-category">DISPLAY</div>
+        <a href="#display" class="nav-item" data-section="display">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="3" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 17h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Popup Layout</span>
+        </a>
+        <a href="#detection" class="nav-item" data-section="detection">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M14 14l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Auto-Convert</span>
+        </a>
+
+        <!-- Advanced -->
+        <div class="nav-category">MORE</div>
+        <a href="#features" class="nav-item" data-section="features">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2l2.5 5 5.5.5-4 4 1 5.5L10 14.5 5 17l1-5.5-4-4 5.5-.5L10 2z" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Features</span>
+        </a>
+        <a href="#advanced" class="nav-item" data-section="advanced">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M17.5 10c0-.75-.25-1.5-.75-2.25l1.5-1.5-2-2-1.5 1.5c-.75-.5-1.5-.75-2.25-.75V2.5h-2.5V5c-.75 0-1.5.25-2.25.75L6.25 4.25l-2 2 1.5 1.5C5.25 8.5 5 9.25 5 10s.25 1.5.75 2.25l-1.5 1.5 2 2 1.5-1.5c.75.5 1.5.75 2.25.75v2.5h2.5V15c.75 0 1.5-.25 2.25-.75l1.5 1.5 2-2-1.5-1.5c.5-.75.75-1.5.75-2.25z" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Advanced</span>
+        </a>
+        <a href="#about" class="nav-item" data-section="about">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 10v4M10 6v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>About</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar footer removed - All links now in About section -->
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-header">
+        <h2 class="content-title">Settings</h2>
+        <div class="header-actions">
+          <div class="status-badge" id="status">
+            <span class="status-dot"></span>
+            <span class="status-text">Auto-saved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-body">
+        <!-- APPEARANCE SECTION -->
+        <section class="settings-section active" data-section-content="appearance">
+          <div class="section-group">
+            <h3 class="section-title">Interface Size & Scale</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">Adjust the size of popup and settings interface to fit your screen perfectly</p>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="uiScale" class="setting-label">UI Scale</label>
+                <p class="setting-hint">Scale: <strong><span id="uiScaleValue">100</span>%</strong> - Resize popup and settings interface</p>
+              </div>
+              <input type="range" id="uiScale" class="range-input" min="70" max="150" step="5" value="100">
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Theme & Visual Style</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="themeSelect" class="setting-label">Interface Theme</label>
+                <p class="setting-hint">Choose your preferred color scheme and visual style</p>
+              </div>
+              <select id="themeSelect" class="select-input">
+                <option value="chrome-dark">🌑 Chrome Dark - Pure Black (Default)</option>
+                <option value="dark">🌙 Dark Mode - Discord Style</option>
+                <option value="default">🎨 Blue Gradient - Classic</option>
+                <option value="professional">💼 Professional - Corporate Blue</option>
+                <option value="minimal">⚪ Minimal - Clean White</option>
+                <option value="vibrant">🌈 Vibrant - Colorful</option>
+                <option value="ocean">🌊 Ocean - Teal & Aqua</option>
+                <option value="sunset">🌅 Sunset - Purple & Pink</option>
+                <option value="forest">🌲 Forest - Green & Nature</option>
+                <option value="midnight">🌃 Midnight - Deep Blue</option>
+                <option value="cherry">🍒 Cherry - Red & Rose</option>
+                <option value="autumn">🍂 Autumn - Amber & Orange</option>
+                <option value="lavender">💜 Lavender - Soft Purple</option>
+                <option value="monochrome">⚫ Monochrome - B&W</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- CURRENCY SECTION -->
+        <section class="settings-section" data-section-content="currency">
+          <div class="section-group">
+            <h3 class="section-title">Currency Settings</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="defaultTargetCurrency" class="setting-label">Default Currency</label>
+                <p class="setting-hint">Your preferred currency for conversions</p>
+              </div>
+              <select id="defaultTargetCurrency" class="select-input">
+                <optgroup label="Popular">
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="ILS">ILS - Israeli Shekel</option>
+                  <option value="JPY">JPY - Japanese Yen</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="CAD">CAD - Canadian Dollar</option>
+                  <option value="AUD">AUD - Australian Dollar</option>
+                  <option value="CHF">CHF - Swiss Franc</option>
+                  <option value="CNY">CNY - Chinese Yuan</option>
+                  <option value="INR">INR - Indian Rupee</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="updateInterval" class="setting-label">Rate Update Interval</label>
+                <p class="setting-hint">How often to refresh exchange rates</p>
+              </div>
+              <div class="input-group">
+                <select id="updateInterval" class="select-input">
+                  <option value="60">1 hour</option>
+                  <option value="360">6 hours</option>
+                  <option value="720">12 hours</option>
+                  <option value="1440">1 day</option>
+                  <option value="2880">2 days</option>
+                </select>
+                <button id="forceRefreshBtn" class="btn-secondary">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M14 8A6 6 0 1 1 2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Refresh Now
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">💰 Supported Currencies</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">
+              <strong>⭐ 100% Currency Coverage:</strong> This extension supports ALL major world currencies with automatic detection!
+            </p>
+
+            <div style="background: var(--color-bg-secondary, #f5f5f5); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <p style="margin: 0 0 12px 0; font-weight: 600; color: var(--color-text, #000);">🌍 Americas (9 currencies)</p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+                <strong>$</strong> USD (US Dollar) • <strong>C$</strong> CAD (Canadian Dollar) • <strong>$</strong> MXN (Mexican Peso)<br>
+                <strong>R$</strong> BRL (Brazilian Real) • <strong>$</strong> ARS (Argentine Peso) • COP, CLP, PEN, VES
+              </p>
+            </div>
+
+            <div style="background: var(--color-bg-secondary, #f5f5f5); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <p style="margin: 0 0 12px 0; font-weight: 600; color: var(--color-text, #000);">🇪🇺 Europe (15+ currencies)</p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+                <strong>€</strong> EUR (Euro) • <strong>£</strong> GBP (British Pound) • <strong>₣</strong> CHF (Swiss Franc)<br>
+                <strong>kr</strong> SEK, NOK, DKK (Scandinavian) • <strong>zł</strong> PLN (Polish Zloty)<br>
+                <strong>Kč</strong> CZK (Czech Koruna) • <strong>Ft</strong> HUF (Hungarian Forint) • <strong>lei</strong> RON (Romanian Leu)<br>
+                <strong>₴</strong> UAH (Ukrainian Hryvnia) • <strong>kr</strong> ISK (Icelandic Króna) • RUB, TRY
+              </p>
+            </div>
+
+            <div style="background: var(--color-bg-secondary, #f5f5f5); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <p style="margin: 0 0 12px 0; font-weight: 600; color: var(--color-text, #000);">🌏 Asia & Pacific (18+ currencies)</p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+                <strong>¥</strong> JPY (Japanese Yen) • <strong>¥</strong> CNY (Chinese Yuan) • <strong>₹</strong> INR (Indian Rupee)<br>
+                <strong>₩</strong> KRW (South Korean Won) • <strong>₪</strong> ILS (Israeli Shekel)<br>
+                <strong>฿</strong> THB (Thai Baht) • <strong>₺</strong> TRY (Turkish Lira) • <strong>₱</strong> PHP (Philippine Peso)<br>
+                <strong>₫</strong> VND (Vietnamese Dong) • <strong>د.إ</strong> AED (UAE Dirham) • <strong>﷼</strong> SAR (Saudi Riyal)<br>
+                <strong>د.ك</strong> KWD (Kuwaiti Dinar) • <strong>﷼</strong> QAR (Qatari Riyal) • <strong>£</strong> EGP (Egyptian Pound)<br>
+                <strong>A$</strong> AUD (Australian Dollar) • <strong>NZ$</strong> NZD (New Zealand Dollar)<br>
+                <strong>S$</strong> SGD (Singapore Dollar) • <strong>HK$</strong> HKD (Hong Kong Dollar) • <strong>NT$</strong> TWD (Taiwan Dollar)
+              </p>
+            </div>
+
+            <div style="background: var(--color-bg-secondary, #f5f5f5); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <p style="margin: 0 0 12px 0; font-weight: 600; color: var(--color-text, #000);">🌍 Africa & Middle East (5+ currencies)</p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+                <strong>R</strong> ZAR (South African Rand) • EGP, MAD, NGN, KES
+              </p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border-radius: 8px; padding: 16px;">
+              <p style="margin: 0 0 8px 0; font-weight: 600;">✨ Smart Detection Features:</p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+                ✅ Detects currency symbols (<strong>$, €, £, ¥, ₪</strong>)<br>
+                ✅ Detects 3-letter codes (<strong>USD, EUR, GBP</strong>)<br>
+                ✅ Detects prefix codes (<strong>US $, HK $, C$</strong>)<br>
+                ✅ Handles decimal formats (<strong>1,234.56 or 1.234,56</strong>)<br>
+                ✅ Supports spaces (<strong>$ 99 or $99</strong>)<br>
+                ✅ Works with ranges (<strong>$10-$20</strong>)
+              </p>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Exchange Rate API</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="apiProvider" class="setting-label">API Provider</label>
+                <p class="setting-hint">Choose your data source for exchange rates</p>
+              </div>
+              <select id="apiProvider" class="select-input">
+                <optgroup label="Free APIs">
+                  <option value="exchangerate-api">ExchangeRate-API (Free - 1500/month)</option>
+                  <option value="currencyapi">CurrencyAPI (Free - 300/month)</option>
+                  <option value="bank-of-israel">Bank of Israel (Free)</option>
+                  <option value="ecb">European Central Bank (Free)</option>
+                </optgroup>
+                <optgroup label="Premium APIs">
+                  <option value="fixer">Fixer.io (API Key Required)</option>
+                  <option value="currencylayer">CurrencyLayer (API Key Required)</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="setting-item" id="apiKeyGroup" style="display: none;">
+              <div class="setting-info">
+                <label for="apiKey" class="setting-label">API Key</label>
+                <p class="setting-hint">Stored securely in encrypted storage</p>
+              </div>
+              <div class="input-group">
+                <input type="password" id="apiKey" class="text-input" placeholder="Enter your API key">
+                <button type="button" id="toggleApiKey" class="btn-secondary">Show</button>
+              </div>
+              <div id="apiKeyGuide"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DISPLAY SECTION -->
+        <section class="settings-section" data-section-content="display">
+          <div class="section-group">
+            <h3 class="section-title">Popup Sections Visibility</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">Control which sections appear in the popup. Only converter and rate info are shown by default for a clean, minimal interface.</p>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Stats Bar</label>
+                <p class="setting-hint">Display status, last update, and theme info</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showStatsBar">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Favorites Section</label>
+                <p class="setting-hint">Quick convert buttons for favorite currencies</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showFavorites">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Action Buttons</label>
+                <p class="setting-hint">Refresh, copy, history, and compare buttons</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showActions">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Quick Toggles</label>
+                <p class="setting-hint">Quick toggle switches for tooltips, highlight, and auto-convert</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showQuickToggles">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Footer Links</label>
+                <p class="setting-hint">Full settings and help button links</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showFooterLinks">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Custom Tooltip section removed - Using native HTML title attribute instead -->
+          <!-- This provides zero conflicts with websites and universal browser support -->
+
+          <div class="section-group">
+            <h3 class="section-title">Display Format</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="decimalPlaces" class="setting-label">🔢 Decimal Places Precision</label>
+                <p class="setting-hint">Control number precision for converted amounts<br>
+                <strong>Examples:</strong><br>
+                • 0: "₪366" (Clean, whole numbers)<br>
+                • 2: "₪366.30" (Standard currency format ⭐)<br>
+                • 3: "₪366.301" (Crypto/forex)<br>
+                • 4: "₪366.3015" (Maximum precision)<br>
+                • Auto: Smart rounding based on value (recommended)</p>
+              </div>
+              <select id="decimalPlaces" class="select-input">
+                <option value="0">0 - No decimals (₪366)</option>
+                <option value="2">2 - Standard (₪366.30)</option>
+                <option value="3">3 - Crypto (₪366.301)</option>
+                <option value="4">4 - Max precision (₪366.3015)</option>
+                <option value="auto">Auto - Smart rounding ⭐</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="currencyDisplay" class="setting-label">Currency Display</label>
+                <p class="setting-hint">How to show currency symbols</p>
+              </div>
+              <select id="currencyDisplay" class="select-input">
+                <option value="symbol">Symbol ($ € £)</option>
+                <option value="code">Code (USD EUR GBP)</option>
+                <option value="both">Both ($12.34 USD)</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Thousand Separators</label>
+                <p class="setting-hint">Use commas in large numbers</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="useThousandSeparator" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Page Interaction</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">Configure how prices are displayed and converted on web pages</p>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">✨ Highlight Detected Prices</label>
+                <p class="setting-hint">Visually mark prices that can be converted<br>
+                <strong>Example:</strong> "$99" gets colored border/background<br>
+                <strong>Note:</strong> Helps identify convertible prices at a glance</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="highlightPrices">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- Auto-Convert on Hover removed - Native HTML title works automatically on hover -->
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">📝 Native HTML Title Tooltip (⭐ ON by default)</label>
+                <p class="setting-hint">Show conversion using native HTML title attribute - Simple & universal!<br>
+                <strong>Example:</strong> Hover "$99" → Browser's native tooltip shows "~₪366.30 ILS"<br>
+                <strong>✅ Benefits:</strong> Zero conflicts, works everywhere, no custom UI, instant<br>
+                <strong>📌 Perfect for:</strong> Shopping sites, price comparisons, quick conversions</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showInlineConversion" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">🔄 Replace Original Prices</label>
+                <p class="setting-hint"><strong>⚠️ Experimental:</strong> Replace prices on page with converted amounts<br>
+                <strong>Example:</strong> "$99" → "₪366.30" (original price replaced)<br>
+                <strong>⚠️ Warning:</strong> May break some sites, use with caution<br>
+                <strong>💡 Tip:</strong> Keep OFF and use native title tooltip instead</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="replacePrice">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- DETECTION SECTION -->
+        <section class="settings-section" data-section-content="detection">
+          <div class="section-group">
+            <h3 class="section-title">Smart Price Detection</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">Configure how the extension detects and converts prices on web pages</p>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="detectionSensitivity" class="setting-label">🎯 Detection Sensitivity</label>
+                <p class="setting-hint">Balance between finding all prices vs avoiding false positives<br>
+                <strong>Examples:</strong><br>
+                • Conservative: Only "$99.99" and "€50.00" (very obvious)<br>
+                • Balanced: "$99.99", "99 USD", "£ 50" (recommended ⭐)<br>
+                • Aggressive: All of above plus "99$", "USD99" (may have false positives)</p>
+              </div>
+              <select id="detectionSensitivity" class="select-input">
+                <option value="low">Conservative - Only obvious prices</option>
+                <option value="medium">Balanced - Smart detection (Recommended)</option>
+                <option value="high">Aggressive - Detect everything possible</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="minPrice" class="setting-label">💰 Minimum Price Threshold</label>
+                <p class="setting-hint">Skip amounts below this value to reduce noise<br>
+                <strong>Example:</strong> Set to "1.00" to ignore small amounts like "$0.99" or "€0.50"<br>
+                <strong>Use cases:</strong><br>
+                • "0.01": Convert everything (including cents)<br>
+                • "1.00": Skip cent amounts (recommended)<br>
+                • "10.00": Only convert significant prices</p>
+              </div>
+              <input type="number" id="minPrice" class="text-input" placeholder="Leave empty or set minimum (e.g., 1.00)" step="0.01" min="0">
+            </div>
+          </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section class="settings-section" data-section-content="features">
+          <div class="section-group">
+            <h3 class="section-title">Page Features</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Show Original Price</label>
+                <p class="setting-hint">Display both original and converted prices</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showOriginalPrice">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Convert on Page Load</label>
+                <p class="setting-hint">Automatically convert when page loads</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="convertOnPageLoad" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Quick Copy on Click</label>
+                <p class="setting-hint">Click converted price to copy</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="quickCopyOnClick">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">History & Favorites</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Save Conversion History</label>
+                <p class="setting-hint">Track all conversions for review</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="saveConversionHistory" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="historyLimit" class="setting-label">History Limit</label>
+                <p class="setting-hint">Maximum conversions to keep</p>
+              </div>
+              <select id="historyLimit" class="select-input">
+                <option value="10">10 conversions</option>
+                <option value="25">25 conversions</option>
+                <option value="50">50 conversions</option>
+                <option value="100">100 conversions</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Sync Favorites</label>
+                <p class="setting-hint">Sync across devices with Chrome</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="syncFavorites" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ADVANCED SECTION -->
+        <section class="settings-section" data-section-content="advanced">
+          <div class="section-group">
+            <h3 class="section-title">Performance</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Cache Exchange Rates</label>
+                <p class="setting-hint">Store rates locally for faster access</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="cacheRates" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Preload Common Currencies</label>
+                <p class="setting-hint">Load popular rates in advance</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="preloadCurrencies" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Batch Process Prices</label>
+                <p class="setting-hint">Convert multiple prices at once</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="batchProcessPrices" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Accessibility</h3>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">High Contrast Mode</label>
+                <p class="setting-hint">Increase contrast for visibility</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="highContrast">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Large Text Mode</label>
+                <p class="setting-hint">Increase font size by 25%</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="largeText">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Reduce Motion</label>
+                <p class="setting-hint">Minimize animations</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="reducedMotion">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">Screen Reader Optimization</label>
+                <p class="setting-hint">Enhanced ARIA labels</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="screenReaderMode">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">🔧 Developer & Debugging</h3>
+            <p class="setting-hint" style="margin-bottom: 1rem; color: var(--color-text-secondary);">Professional debugging tools for developers and troubleshooting</p>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">🐛 Professional Debug Mode</label>
+                <p class="setting-hint"><strong>Advanced console logging system:</strong><br>
+                • ✅ <strong>When ON:</strong> Detailed color-coded logs with timestamps ([CCP], [ERROR], [WARN], [DEBUG], [PERF])<br>
+                • ❌ <strong>When OFF:</strong> ZERO console output - production-ready silent mode<br>
+                • 🎯 <strong>Categories:</strong> Price detection, conversion logic, performance metrics, API calls<br>
+                • 📊 <strong>Performance tracking:</strong> Measure execution times for optimization<br>
+                <strong>Perfect for:</strong> Development, bug reporting, performance analysis</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="debugMode">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- Show Notifications feature removed - Debug mode provides superior feedback -->
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Data Management</h3>
+
+            <div class="actions-grid">
+              <button id="clearCacheBtn" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 4h12M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M13 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Clear Cache
+              </button>
+              <button id="exportSettingsBtn" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3M8 10V2M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Export Settings
+              </button>
+              <button id="importSettingsBtn" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3M8 2v8M11 7l-3 3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Import Settings
+              </button>
+              <button id="testConnectionBtn" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 1v2M8 13v2M15 8h-2M3 8H1M13.5 13.5l-1.5-1.5M4 4L2.5 2.5M13.5 2.5L12 4M4 12l-1.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Test Connection
+              </button>
+              <button id="resetBtn" class="btn-secondary" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M14 8A6 6 0 1 1 2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Reset All Settings
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section class="settings-section" data-section-content="about">
+          <div class="about-card">
+            <div class="about-header">
+              <img src="../../icons/icon-128.png" alt="Currency Converter Pro" class="about-logo">
+              <div>
+                <h3 class="about-title">Currency Converter Pro</h3>
+                <p class="about-version">Version <span class="version-number" id="aboutVersion">...</span></p>
+              </div>
+            </div>
+            <p class="about-description">
+              Transform your international shopping experience with intelligent, real-time currency conversion.
+              See exact prices in your preferred currency on any website.
+            </p>
+
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-value">170+</div>
+                <div class="stat-label">Currencies</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">9</div>
+                <div class="stat-label">API Sources</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Themes</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Private</div>
+              </div>
+            </div>
+
+            <div class="about-links">
+              <a href="https://github.com/KuchiSofts/Currency-Converter-Pro" target="_blank" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                View on GitHub
+              </a>
+              <a href="https://github.com/KuchiSofts/Currency-Converter-Pro/issues" target="_blank" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 4v4M8 10v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Report Issue
+              </a>
+            </div>
+
+            <div class="about-footer">
+              <p>Made with ❤️ by <strong>KuchiSofts</strong></p>
+              <p class="about-copyright">© 2025 Currency Converter Pro. All rights reserved.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <input type="file" id="importFile" accept=".json" style="display: none;">
+  <script src="../../lib/themes.js?version=3.0.0"></script>
+  <script src="tabs.js?version=3.0.0"></script>
+  <script src="options.js?version=3.0.0"></script>
+</body>
+</html>

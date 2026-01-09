@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Currency Converter Pro",
+  "version": "3.2.2",
+  "description": "Convert currencies on any webpage. Auto-detects prices and shows conversions. Supports 170+ currencies with real-time rates.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://api.exchangerate-api.com/*",
+    "https://api.fixer.io/*",
+    "https://api.currencylayer.com/*",
+    "https://www.boi.org.il/*",
+    "https://api.exchangerate.host/*",
+    "https://api.currencyapi.com/*",
+    "https://api.exchangerates.host/*",
+    "https://openexchangerates.org/*",
+    "https://api.xe.com/*",
+    "https://api.coingecko.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/logger.js",
+        "lib/regex.js",
+        "lib/patterns.js",
+        "lib/themes.js",
+        "content.js"
+      ],
+      "css": ["styles/content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "pages/popup/popup.html",
+    "default_title": "Currency Converter Pro",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "options_ui": {
+    "page": "pages/options/options.html",
+    "open_in_tab": true
+  }
+}
