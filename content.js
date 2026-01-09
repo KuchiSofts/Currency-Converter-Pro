@@ -3333,12 +3333,25 @@ function detectPricesFromCrypto() {
   let converted = 0;
   let skipped = 0;
 
+  // Check if we have any crypto rates loaded
+  const cryptoRates = ['BTC', 'ETH', 'USDT', 'USDC', 'BNB', 'XRP', 'ADA', 'SOL', 'DOGE', 'DOT', 'MATIC', 'LTC'];
+  const availableCrypto = cryptoRates.filter(code => exchangeRates[code]);
+
+  log(`🔍 Crypto detection starting...`);
+  log(`💰 Available crypto rates: ${availableCrypto.length > 0 ? availableCrypto.join(', ') : 'NONE'}`);
+  log(`📊 Total exchange rates loaded: ${Object.keys(exchangeRates).length}`);
+
+  if (availableCrypto.length === 0) {
+    log(`⚠️ No cryptocurrency rates available - skipping crypto detection`);
+    return { converted: 0, skipped: 0 };
+  }
+
   // Performance limit
   const MAX_ELEMENTS = 500;
 
   // Find all text elements that might contain crypto prices
   const textElements = Array.from(
-    document.querySelectorAll('p, div, span, li, td, th, h1, h2, h3, h4, h5, h6, a, label')
+    document.querySelectorAll('p, div, span, li, td, th, h1, h2, h3, h4, h5, h6, a, label, code')
   ).slice(0, MAX_ELEMENTS);
 
   for (const element of textElements) {
@@ -3375,6 +3388,7 @@ function detectPricesFromCrypto() {
     // Check if we have exchange rate for this crypto
     if (!exchangeRates[cryptoCode]) {
       log(`⚠️ No exchange rate available for ${cryptoCode}`);
+      log(`📊 Available rates:`, Object.keys(exchangeRates).filter(k => k.length <= 4).join(', '));
       skipped++;
       continue;
     }
@@ -3480,44 +3494,45 @@ function convertPrices() {
     }
   };
 
-  // PASS 1: Semantic HTML attributes (data-*, aria-*, itemprop)
-  safeExecutePass('PASS 1: Semantic HTML', detectPricesFromSemanticHTML);
+  // PASS 1: Cryptocurrency detection (BTC, ETH, USDT, etc.) - MUST RUN FIRST!
+  // This runs first to prevent other passes from misinterpreting crypto as USD
+  safeExecutePass('PASS 1: Cryptocurrency', detectPricesFromCrypto);
 
-  // PASS 2: Structured data (JSON-LD, microdata)
-  safeExecutePass('PASS 2: Structured data', detectPricesFromStructuredData);
+  // PASS 2: Semantic HTML attributes (data-*, aria-*, itemprop)
+  safeExecutePass('PASS 2: Semantic HTML', detectPricesFromSemanticHTML);
 
-  // PASS 3: Attribute-based detection (title, alt, value, placeholder)
-  safeExecutePass('PASS 3: Attributes', detectPricesFromAttributes);
+  // PASS 3: Structured data (JSON-LD, microdata)
+  safeExecutePass('PASS 3: Structured data', detectPricesFromStructuredData);
 
-  // PASS 4: Table pattern detection (price tables)
-  safeExecutePass('PASS 4: Tables', detectPricesFromTables);
+  // PASS 4: Attribute-based detection (title, alt, value, placeholder)
+  safeExecutePass('PASS 4: Attributes', detectPricesFromAttributes);
 
-  // PASS 5: List pattern detection (product listings)
-  safeExecutePass('PASS 5: Lists', detectPricesFromLists);
+  // PASS 5: Table pattern detection (price tables)
+  safeExecutePass('PASS 5: Tables', detectPricesFromTables);
 
-  // PASS 6: Input/form detection (hidden price inputs, calculators)
-  safeExecutePass('PASS 6: Forms', detectPricesFromForms);
+  // PASS 6: List pattern detection (product listings)
+  safeExecutePass('PASS 6: Lists', detectPricesFromLists);
 
-  // PASS 7: CSS-based visual detection (font size, bold, classes)
-  safeExecutePass('PASS 7: Visual styles', detectPricesFromVisualStyles);
+  // PASS 7: Input/form detection (hidden price inputs, calculators)
+  safeExecutePass('PASS 7: Forms', detectPricesFromForms);
 
-  // PASS 8: Adjacent text patterns (Price:, Cost:, Total:)
-  safeExecutePass('PASS 8: Adjacent labels', detectPricesFromAdjacentText);
+  // PASS 8: CSS-based visual detection (font size, bold, classes)
+  safeExecutePass('PASS 8: Visual styles', detectPricesFromVisualStyles);
 
-  // PASS 9: Meta tag detection (og:price, twitter:price)
-  safeExecutePass('PASS 9: Meta tags', detectPricesFromMetaTags);
+  // PASS 9: Adjacent text patterns (Price:, Cost:, Total:)
+  safeExecutePass('PASS 9: Adjacent labels', detectPricesFromAdjacentText);
 
-  // PASS 10: Shadow DOM detection (Web Components)
-  safeExecutePass('PASS 10: Shadow DOM', detectPricesFromShadowDOM);
+  // PASS 10: Meta tag detection (og:price, twitter:price)
+  safeExecutePass('PASS 10: Meta tags', detectPricesFromMetaTags);
 
-  // PASS 11: Text pattern matching (starting from $, only €)
-  safeExecutePass('PASS 11: Text patterns', detectPricesFromTextPatterns);
+  // PASS 11: Shadow DOM detection (Web Components)
+  safeExecutePass('PASS 11: Shadow DOM', detectPricesFromShadowDOM);
 
-  // PASS 12: ARIA labels and accessibility attributes
-  safeExecutePass('PASS 12: ARIA labels', detectPricesFromAriaLabels);
+  // PASS 12: Text pattern matching (starting from $, only €)
+  safeExecutePass('PASS 12: Text patterns', detectPricesFromTextPatterns);
 
-  // PASS 13: Cryptocurrency detection (BTC, ETH, USDT, etc.)
-  safeExecutePass('PASS 13: Cryptocurrency', detectPricesFromCrypto);
+  // PASS 13: ARIA labels and accessibility attributes
+  safeExecutePass('PASS 13: ARIA labels', detectPricesFromAriaLabels);
 
   // ============================================================================
   // 🎯 SELECTOR-BASED DETECTION (Pass 14 - Original method)
