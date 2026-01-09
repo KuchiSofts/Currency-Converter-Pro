@@ -476,10 +476,20 @@ async function loadRates() {
     const response = await chrome.runtime.sendMessage({ type: 'getExchangeRates' });
     if (response && response.rates) {
       exchangeRates = response.rates;
+      const cryptoCodes = ['BTC', 'ETH', 'USDT', 'USDC', 'BNB', 'XRP', 'ADA', 'SOL', 'DOGE', 'DOT', 'MATIC', 'LTC'];
+      const availableCrypto = cryptoCodes.filter(code => exchangeRates[code]);
       log('💱 Loaded exchange rates:', Object.keys(exchangeRates).length, 'currencies');
+      log('💰 Crypto rates included:', availableCrypto.length > 0 ? availableCrypto.join(', ') : 'NONE');
+
+      // Debug: Show first few rate values for crypto
+      if (availableCrypto.length > 0) {
+        log('📊 Sample crypto rates:', availableCrypto.slice(0, 3).map(code =>
+          `${code}=${exchangeRates[code]?.toExponential(4) || 'undefined'}`
+        ).join(', '));
+      }
     }
   } catch (e) {
-    log('⚠️ Using fallback rates');
+    log('⚠️ Using fallback rates:', e.message);
   }
 }
 
