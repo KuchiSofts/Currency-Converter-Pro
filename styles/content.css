@@ -1,0 +1,214 @@
+/* Content script styles for currency conversion - OPTIMIZED & MINIMAL */
+/* No custom tooltips - using native HTML title attribute instead */
+
+:root {
+  /* Highlight colors for detected prices */
+  --highlight-primary: #3b82f6;
+  --highlight-light: rgba(59, 130, 246, 0.1);
+  --highlight-border: #3b82f6;
+}
+
+/* ===== PRICE HIGHLIGHTING ===== */
+/* Subtle dotted underline for detected prices */
+.currency-converter-price-detected {
+  border-bottom: 2px dotted var(--highlight-border);
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.currency-converter-price-detected:hover {
+  background-color: var(--highlight-light);
+  border-bottom-color: var(--highlight-primary);
+  border-bottom-style: solid;
+}
+
+/* ===== REPLACED PRICES (when replacePrice is ON) ===== */
+.currency-converter-replaced {
+  color: var(--highlight-primary);
+  font-weight: 600;
+  border-bottom: 1px dotted var(--highlight-border);
+}
+
+/* ===== ACCESSIBILITY MODES ===== */
+
+/* High Contrast Mode */
+body.cc-high-contrast .currency-converter-price-detected {
+  border-bottom: 3px solid var(--highlight-primary);
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+body.cc-high-contrast .currency-converter-price-detected:hover {
+  background-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 2px var(--highlight-primary);
+}
+
+/* Large Text Mode */
+body.cc-large-text .currency-converter-price-detected {
+  font-size: 1.25em;
+  padding: 2px 4px;
+}
+
+/* Reduced Motion Mode */
+body.cc-reduced-motion .currency-converter-price-detected {
+  transition: none;
+}
+
+/* Screen Reader Mode */
+body.cc-screen-reader .currency-converter-price-detected::before {
+  content: attr(data-sr-label);
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ===== CONTEXT MENU INDICATOR ===== */
+.currency-converter-price-detected[data-has-context-menu="true"] {
+  cursor: context-menu;
+}
+
+/* ===== THEME-SPECIFIC OVERRIDES ===== */
+
+/* Chrome Dark Theme */
+[data-theme="chrome-dark"],
+body[data-theme="chrome-dark"] {
+  --highlight-primary: #8ab4f8;
+  --highlight-light: rgba(138, 180, 248, 0.1);
+  --highlight-border: #8ab4f8;
+}
+
+/* Dark Theme (Discord-style) */
+[data-theme="dark"],
+body[data-theme="dark"] {
+  --highlight-primary: #5865F2;
+  --highlight-light: rgba(88, 101, 242, 0.1);
+  --highlight-border: #5865F2;
+}
+
+/* Professional Theme */
+[data-theme="professional"],
+body[data-theme="professional"] {
+  --highlight-primary: #2563eb;
+  --highlight-light: rgba(37, 99, 235, 0.1);
+  --highlight-border: #2563eb;
+}
+
+/* Minimal Theme */
+[data-theme="minimal"],
+body[data-theme="minimal"] {
+  --highlight-primary: #374151;
+  --highlight-light: rgba(55, 65, 81, 0.1);
+  --highlight-border: #374151;
+}
+
+/* Vibrant Theme */
+[data-theme="vibrant"],
+body[data-theme="vibrant"] {
+  --highlight-primary: #f59e0b;
+  --highlight-light: rgba(245, 158, 11, 0.1);
+  --highlight-border: #f59e0b;
+}
+
+/* Ocean Theme */
+[data-theme="ocean"],
+body[data-theme="ocean"] {
+  --highlight-primary: #0891b2;
+  --highlight-light: rgba(8, 145, 178, 0.1);
+  --highlight-border: #0891b2;
+}
+
+/* Sunset Theme */
+[data-theme="sunset"],
+body[data-theme="sunset"] {
+  --highlight-primary: #a855f7;
+  --highlight-light: rgba(168, 85, 247, 0.1);
+  --highlight-border: #a855f7;
+}
+
+/* Forest Theme */
+[data-theme="forest"],
+body[data-theme="forest"] {
+  --highlight-primary: #059669;
+  --highlight-light: rgba(5, 150, 105, 0.1);
+  --highlight-border: #059669;
+}
+
+/* Midnight Theme */
+[data-theme="midnight"],
+body[data-theme="midnight"] {
+  --highlight-primary: #1d4ed8;
+  --highlight-light: rgba(29, 78, 216, 0.1);
+  --highlight-border: #1d4ed8;
+}
+
+/* Cherry Theme */
+[data-theme="cherry"],
+body[data-theme="cherry"] {
+  --highlight-primary: #e11d48;
+  --highlight-light: rgba(225, 29, 72, 0.1);
+  --highlight-border: #e11d48;
+}
+
+/* Autumn Theme */
+[data-theme="autumn"],
+body[data-theme="autumn"] {
+  --highlight-primary: #d97706;
+  --highlight-light: rgba(217, 119, 6, 0.1);
+  --highlight-border: #d97706;
+}
+
+/* Lavender Theme */
+[data-theme="lavender"],
+body[data-theme="lavender"] {
+  --highlight-primary: #8b5cf6;
+  --highlight-light: rgba(139, 92, 246, 0.1);
+  --highlight-border: #8b5cf6;
+}
+
+/* Monochrome Theme */
+[data-theme="monochrome"],
+body[data-theme="monochrome"] {
+  --highlight-primary: #000000;
+  --highlight-light: rgba(0, 0, 0, 0.05);
+  --highlight-border: #000000;
+}
+
+/* Default Theme (Blue Gradient) */
+[data-theme="default"],
+body[data-theme="default"] {
+  --highlight-primary: #3b82f6;
+  --highlight-light: rgba(59, 130, 246, 0.1);
+  --highlight-border: #3b82f6;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .currency-converter-price-detected {
+    border-bottom-width: 3px; /* Thicker border on mobile for easier tapping */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .currency-converter-price-detected {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --highlight-primary: #8ab4f8;
+    --highlight-light: rgba(138, 180, 248, 0.15);
+    --highlight-border: #8ab4f8;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .currency-converter-price-detected {
+    border: none !important;
+    background: none !important;
+    color: inherit !important;
+  }
+}
