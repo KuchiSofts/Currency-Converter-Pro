@@ -56,7 +56,8 @@ const {
   CURRENCY_MAP,
   detectWebsiteType,
   getPriceSelectors,
-  getCurrencySymbol
+  getCurrencySymbol,
+  getCurrencyDecimals
 } = window.CurrencyPatterns || {};
 
 // Initial load message - only shows when DEBUG_MODE = true (will be set after settings load)
@@ -602,23 +603,31 @@ function applyAccessibilitySettings() {
   }
 }
 
+// Get smart decimal places for currency-aware formatting
+function getSmartDecimals(currency, amount = null) {
+  if (settings.decimalPlaces === 'auto') {
+    // Use currency-specific decimals
+    let decimals = getCurrencyDecimals(currency);
+
+    // Additional smart rounding for 2-decimal currencies
+    if (decimals === 2 && amount !== null) {
+      if (amount < 1) {
+        decimals = 4; // Small amounts need more precision
+      } else if (amount > 10000) {
+        decimals = 0; // Large amounts don't need decimals
+      }
+    }
+
+    return decimals;
+  } else {
+    return parseInt(settings.decimalPlaces || 2);
+  }
+}
+
 // Format number according to user settings
 function formatNumber(amount, currency) {
-  let decimals = 2; // default
-
-  // Determine decimal places
-  if (settings.decimalPlaces === 'auto') {
-    // Auto mode: smart rounding
-    if (amount < 1) {
-      decimals = 4; // Small amounts get more precision
-    } else if (amount > 1000) {
-      decimals = 0; // Large amounts don't need decimals
-    } else {
-      decimals = 2; // Standard amounts
-    }
-  } else if (settings.decimalPlaces !== 'auto') {
-    decimals = parseInt(settings.decimalPlaces);
-  }
+  // Use smart decimal places
+  const decimals = getSmartDecimals(currency, amount);
 
   // Round to specified decimals
   let rounded = amount.toFixed(decimals);
