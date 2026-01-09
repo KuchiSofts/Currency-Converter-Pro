@@ -3325,6 +3325,129 @@ function detectPricesFromAriaLabels() {
   return { converted, skipped };
 }
 
+/**
+ * PASS 13: Cryptocurrency detection
+ * Finds and converts cryptocurrency prices (BTC, ETH, etc.)
+ */
+function detectPricesFromCrypto() {
+  let converted = 0;
+  let skipped = 0;
+
+  // Performance limit
+  const MAX_ELEMENTS = 500;
+
+  // Find all text elements that might contain crypto prices
+  const textElements = Array.from(
+    document.querySelectorAll('p, div, span, li, td, th, h1, h2, h3, h4, h5, h6, a, label')
+  ).slice(0, MAX_ELEMENTS);
+
+  for (const element of textElements) {
+    if (processedElements.has(element) || element.dataset.converted === 'true') {
+      skipped++;
+      continue;
+    }
+
+    const text = element.textContent?.trim();
+    if (!text || text.length < 3 || text.length > 100) {
+      skipped++;
+      continue;
+    }
+
+    // Use the CRYPTO_PRICE_REGEX from lib/regex.js
+    const match = text.match(window.PriceRegex.CRYPTO_PRICE_REGEX);
+    if (!match) {
+      skipped++;
+      continue;
+    }
+
+    const amount = parseFloat(match[1]);
+    const cryptoCode = match[2].toUpperCase();
+
+    log(`💰 Crypto detected: ${amount} ${cryptoCode}`);
+
+    // Validate amount
+    if (!amount || amount <= 0 || amount > 1000000000) {
+      log(`⚠️ Invalid crypto amount: ${amount}`);
+      skipped++;
+      continue;
+    }
+
+    // Check if we have exchange rate for this crypto
+    if (!exchangeRates[cryptoCode]) {
+      log(`⚠️ No exchange rate available for ${cryptoCode}`);
+      skipped++;
+      continue;
+    }
+
+    // Convert crypto → USD → target currency
+    // exchangeRates[cryptoCode] = how many crypto per 1 USD
+    // So: 1 crypto = 1 / exchangeRates[cryptoCode] USD
+    const usdValue = amount / exchangeRates[cryptoCode];
+
+    // Now convert USD to target currency
+    const targetRate = exchangeRates[settings.defaultTargetCurrency];
+    if (!targetRate) {
+      log(`⚠️ No exchange rate available for ${settings.defaultTargetCurrency}`);
+      skipped++;
+      continue;
+    }
+
+    const convertedAmount = usdValue * targetRate;
+
+    log(`🔄 Conversion: ${amount} ${cryptoCode} = $${usdValue.toFixed(2)} USD = ${convertedAmount.toFixed(2)} ${settings.defaultTargetCurrency}`);
+
+    // Format the converted price
+    const targetSymbol = getCurrencySymbol(settings.defaultTargetCurrency);
+    const decimals = settings.decimalPlaces === 'auto' ? 2 : parseInt(settings.decimalPlaces || 2);
+    const formattedAmount = convertedAmount.toFixed(decimals);
+
+    // Apply thousand separator if enabled
+    let displayAmount = formattedAmount;
+    if (settings.useThousandSeparator) {
+      const parts = formattedAmount.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      displayAmount = parts.join('.');
+    }
+
+    const convertedText = `${targetSymbol}${displayAmount} ${settings.defaultTargetCurrency}`;
+
+    // Store original data
+    element.dataset.converted = 'true';
+    element.dataset.originalPrice = text;
+    element.dataset.sourceCurrency = cryptoCode;
+    element.dataset.convertedText = convertedText;
+
+    // Apply conversion based on display mode
+    if (settings.replacePrice) {
+      // Replace mode: "₪185,123.45 ILS (was 1.5 ETH)"
+      element.textContent = `${convertedText} (was ${amount} ${cryptoCode})`;
+      element.title = `Original: ${amount} ${cryptoCode}`;
+      log(`✅ Replaced crypto price: ${amount} ${cryptoCode} → ${convertedText}`);
+    } else if (settings.showInlineConversion) {
+      // Inline mode: "1.5 ETH (₪185,123.45 ILS)"
+      element.textContent = `${amount} ${cryptoCode} (${convertedText})`;
+      log(`✅ Inline crypto conversion: ${amount} ${cryptoCode} (${convertedText})`);
+    } else {
+      // Tooltip mode (default): hover to see conversion
+      element.title = convertedText;
+
+      // Add highlight if enabled
+      if (settings.highlightPrices) {
+        const highlightColors = getHighlightColors();
+        element.style.borderBottom = `2px dotted ${highlightColors.borderColor}`;
+        element.style.cursor = 'help';
+      }
+
+      log(`✅ Added crypto tooltip: ${convertedText}`);
+    }
+
+    processedElements.add(element);
+    converted++;
+  }
+
+  return { converted, skipped };
+}
+
 // Find and convert prices
 function convertPrices() {
   log('🔍 Looking for prices in ALL currencies...');
@@ -3393,11 +3516,14 @@ function convertPrices() {
   // PASS 12: ARIA labels and accessibility attributes
   safeExecutePass('PASS 12: ARIA labels', detectPricesFromAriaLabels);
 
+  // PASS 13: Cryptocurrency detection (BTC, ETH, USDT, etc.)
+  safeExecutePass('PASS 13: Cryptocurrency', detectPricesFromCrypto);
+
   // ============================================================================
-  // 🎯 SELECTOR-BASED DETECTION (Pass 13 - Original method)
+  // 🎯 SELECTOR-BASED DETECTION (Pass 14 - Original method)
   // ============================================================================
 
-  log('🔍 PASS 13: Selector-based detection...');
+  log('🔍 PASS 14: Selector-based detection...');
   const selectors = getPriceSelectors(siteType);
   const priceElements = document.querySelectorAll(selectors.join(','));
 
