@@ -1579,6 +1579,11 @@ function analyzeSemanticHTML(element) {
 
 // ⭐ ADVANCED: Detect quantity-aware pricing ("2 for $10", "$5 each")
 function detectQuantityPricing(text) {
+  // Validate input
+  if (!text || typeof text !== 'string') {
+    return { isQuantityPrice: false };
+  }
+
   const patterns = [
     // "2 for $10", "3 for €15"
     /(\d+)\s+for\s+([\$€£¥₹₪₽₩]\s*\d+[.,]?\d*)/i,
@@ -1596,11 +1601,17 @@ function detectQuantityPricing(text) {
         return { isQuantityPrice: true, shouldSkip: true, reason: 'bulk_offer' };
       }
 
+      // Validate that we have a valid priceText
+      const priceText = match[2] || match[1];
+      if (!priceText) {
+        continue; // Skip this match if no price text found
+      }
+
       return {
         isQuantityPrice: true,
         shouldSkip: false,
         quantity: match[1] ? parseInt(match[1]) : 1,
-        priceText: match[2] || match[1]
+        priceText: priceText
       };
     }
   }
@@ -1610,11 +1621,21 @@ function detectQuantityPricing(text) {
 
 // ⭐ ADVANCED: Detect multi-currency display ("US $5.81 (€5.20)")
 function detectMultiCurrency(text) {
+  // Validate input
+  if (!text || typeof text !== 'string') {
+    return { isMultiCurrency: false };
+  }
+
   // Pattern: "USD 5.81 (EUR 5.20)" or "$5.81 (€5.20)"
   const pattern = /(?:([\$€£¥₹₪₽₩]|USD|EUR|GBP|JPY)\s*(\d+[.,]?\d*))\s*\(([^)]+)\)/i;
   const match = text.match(pattern);
 
   if (match) {
+    // Validate match groups
+    if (!match[1] || !match[2]) {
+      return { isMultiCurrency: false };
+    }
+
     const primaryPrice = match[1] + ' ' + match[2];
     const secondaryPrice = match[3];
 
