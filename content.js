@@ -1429,15 +1429,26 @@ function convertPriceRange(rangeData, targetCurrency) {
 
   // Format with appropriate decimal places
   const decimals = settings.decimalPlaces === 'auto' ? 2 : parseInt(settings.decimalPlaces || 2);
-  const formattedMin = convertedMin.toFixed(decimals);
-  const formattedMax = convertedMax.toFixed(decimals);
+  let formattedMin = convertedMin.toFixed(decimals);
+  let formattedMax = convertedMax.toFixed(decimals);
+
+  // Apply thousand separator if enabled
+  if (settings.useThousandSeparator) {
+    const partsMin = formattedMin.split('.');
+    partsMin[0] = partsMin[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    formattedMin = partsMin.join('.');
+
+    const partsMax = formattedMax.split('.');
+    partsMax[0] = partsMax[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    formattedMax = partsMax.join('.');
+  }
 
   // Get target currency symbol
   const targetSymbol = getCurrencySymbol(targetCurrency);
 
-  // Build converted range string
-  // Format: "ILS ₪31.70-37.72" (preserving original separator)
-  const convertedRange = `${targetCurrency} ${targetSymbol}${formattedMin}${separator}${formattedMax}`;
+  // Build converted range string with symbol on both values for clarity
+  // Format: "₪31.70-₪63.40 ILS" (symbol on both prices)
+  const convertedRange = `${targetSymbol}${formattedMin}${separator}${targetSymbol}${formattedMax} ${targetCurrency}`;
 
   log(`✅ Converted range: ${sourceCurrency} ${minPrice}-${maxPrice} → ${convertedRange}`);
 
@@ -1978,6 +1989,28 @@ function extractAmount(text, currency, element = null) {
       log('🔍 Found fragmented price:', fragmentedText, 'from original:', text);
       text = fragmentedText;
     }
+  }
+
+  // ⭐ SMART: Check for abbreviated amounts first (k/M/B/T)
+  // Matches: $5k, €2.5M, £1.2B, ¥100K, $3.5T
+  const abbreviatedMatch = text.match(/([€£¥₹₪₽₩฿₺₣₱₫₴\$]|USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY)\s*(\d+(?:[.,]\d+)?)\s*([KkMmBbTt])\b/i);
+
+  if (abbreviatedMatch) {
+    const baseAmount = parseFloat(abbreviatedMatch[2].replace(',', '.'));
+    const suffix = abbreviatedMatch[3].toUpperCase();
+
+    // Multiply based on suffix
+    let multiplier = 1;
+    switch (suffix) {
+      case 'K': multiplier = 1000; break;           // Thousand
+      case 'M': multiplier = 1000000; break;        // Million
+      case 'B': multiplier = 1000000000; break;     // Billion
+      case 'T': multiplier = 1000000000000; break;  // Trillion
+    }
+
+    const result = baseAmount * multiplier;
+    log(`🔢 Abbreviated amount detected: ${abbreviatedMatch[2]}${suffix} = ${result.toLocaleString()}`);
+    return result;
   }
 
   // Common price patterns (more comprehensive)
