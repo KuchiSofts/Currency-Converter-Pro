@@ -780,9 +780,103 @@ async function testConnection() {
   }
 }
 
+// Known settings and their expected types - used to validate imported files
+const SETTINGS_SCHEMA = {
+  uiScale: 'number',
+  selectedTheme: 'string',
+  defaultTargetCurrency: 'currency',
+  defaultSourceCurrency: 'currency',
+  updateInterval: 'number',
+  highlightPrices: 'boolean',
+  showInlineConversion: 'boolean',
+  replacePrice: 'boolean',
+  apiProvider: 'provider',
+  apiKey: 'string',
+  showStatsBar: 'boolean',
+  showFavorites: 'boolean',
+  showActions: 'boolean',
+  showQuickToggles: 'boolean',
+  showFooterLinks: 'boolean',
+  decimalPlaces: 'string',
+  currencyDisplay: 'string',
+  useThousandSeparator: 'boolean',
+  detectionSensitivity: 'string',
+  minPrice: 'nullableNumber',
+  maxPrice: 'nullableNumber',
+  enableSounds: 'boolean',
+  debugMode: 'boolean',
+  highContrast: 'boolean',
+  largeText: 'boolean',
+  reducedMotion: 'boolean',
+  screenReaderMode: 'boolean',
+  showOriginalPrice: 'boolean',
+  convertOnPageLoad: 'boolean',
+  quickCopyOnClick: 'boolean',
+  autoDetectPageCurrency: 'boolean',
+  showRateTrends: 'boolean',
+  persistConversions: 'boolean',
+  saveConversionHistory: 'boolean',
+  historyLimit: 'string',
+  syncFavorites: 'boolean',
+  autoAddFrequentCurrencies: 'boolean',
+  favoriteCurrencies: 'currencyList',
+  cacheRates: 'boolean',
+  preloadCurrencies: 'boolean',
+  lazyLoadConversions: 'boolean',
+  batchProcessPrices: 'boolean',
+  offlineMode: 'boolean',
+  smartRounding: 'boolean',
+  contextAwareConversion: 'boolean',
+  multiCurrencyDetection: 'boolean',
+  rateAlerts: 'boolean',
+  showConfidenceScore: 'boolean',
+  symbolPosition: 'string',
+  roundingMethod: 'string',
+  useNativeNumbers: 'boolean',
+  showCurrencyFlags: 'boolean'
+};
+
+const CURRENCY_CODE_PATTERN = /^[A-Z]{3,5}$/;
+
+function isValidSettingValue(type, value) {
+  switch (type) {
+    case 'boolean':
+      return typeof value === 'boolean';
+    case 'number':
+      return typeof value === 'number' && isFinite(value) && value > 0;
+    case 'nullableNumber':
+      return value === null || (typeof value === 'number' && isFinite(value) && value >= 0);
+    case 'string':
+      return typeof value === 'string' && value.length <= 200;
+    case 'currency':
+      return typeof value === 'string' && CURRENCY_CODE_PATTERN.test(value);
+    case 'currencyList':
+      return Array.isArray(value) && value.length <= 20 &&
+        value.every(code => typeof code === 'string' && CURRENCY_CODE_PATTERN.test(code));
+    case 'provider': {
+      const options = Array.from(document.getElementById('apiProvider').options);
+      return options.some(option => option.value === value);
+    }
+    default:
+      return false;
+  }
+}
+
 async function exportSettings() {
   try {
     const settings = await chrome.storage.sync.get();
+
+    // The API key is a personal secret - only include it if the user agrees
+    if (settings.apiKey) {
+      const includeKey = confirm(
+        'Your settings include an API key.\n\n' +
+        'Click OK to include the API key in the exported file, or Cancel to export without it.'
+      );
+      if (!includeKey) {
+        delete settings.apiKey;
+      }
+    }
+
     const exportData = {
       version: '1.0.0',
       timestamp: new Date().toISOString(),
@@ -816,14 +910,39 @@ async function importSettings(event) {
     const text = await file.text();
     const importData = JSON.parse(text);
 
-    if (!importData.settings) {
+    if (!importData || typeof importData.settings !== 'object' || importData.settings === null ||
+        Array.isArray(importData.settings)) {
       throw new Error('Invalid settings file format');
     }
 
-    await chrome.storage.sync.set(importData.settings);
+    // Only accept known settings with the expected type
+    const validSettings = {};
+    const skipped = [];
+    Object.entries(importData.settings).forEach(([key, value]) => {
+      const type = SETTINGS_SCHEMA[key];
+      if (type && isValidSettingValue(type, value)) {
+        validSettings[key] = value;
+      } else {
+        skipped.push(key);
+      }
+    });
+
+    if (Object.keys(validSettings).length === 0) {
+      throw new Error('No valid settings found in file');
+    }
+    if (skipped.length > 0) {
+      console.warn('Skipped unknown or invalid settings:', skipped);
+    }
+
+    await chrome.storage.sync.set(validSettings);
     await loadSettings();
 
-    updateStatus('Settings imported successfully', 'success');
+    updateStatus(
+      skipped.length > 0
+        ? `Settings imported (${skipped.length} invalid entries skipped)`
+        : 'Settings imported successfully',
+      'success'
+    );
     event.target.value = ''; // Reset file input
 
   } catch (error) {
