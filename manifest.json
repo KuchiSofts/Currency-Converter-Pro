@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Currency Converter Pro",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "Convert prices on any webpage to your currency. Auto-detects prices in 160+ currencies and major cryptocurrencies.",
   "permissions": [
     "storage",

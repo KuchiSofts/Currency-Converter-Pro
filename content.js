@@ -1,5 +1,5 @@
 // Multi-Currency Price Converter - ENHANCED VERSION
-// Version: 3.2.2 - Professional Modular Architecture
+// Version: 3.3.0 - Professional Modular Architecture
 
 // Prevent duplicate injection
 if (window.CurrencyConverterProLoaded) {
@@ -61,7 +61,7 @@ const {
 } = window.CurrencyPatterns || {};
 
 // Initial load message - only shows when DEBUG_MODE = true (will be set after settings load)
-log('💱 Currency Converter Pro v3.2.2 initializing...');
+log(`💱 Currency Converter Pro v${chrome.runtime.getManifest().version} initializing...`);
 
 let exchangeRates = { USD: 1, ILS: 3.7, EUR: 1.1, GBP: 0.8 };
 let settings = {
