@@ -381,9 +381,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           enabled: false
         });
       }
+      // Always answer so the sender's promise settles instead of failing
+      // with "The message port closed before a response was received"
+      sendResponse({ success: true });
     });
-    // Return true to indicate async response (even though we don't send one)
-    return true;
+    return true; // Response is sent asynchronously
   }
 
   // Handle other message types from background.js message listener further down
