@@ -4,9 +4,7 @@
   "version": "3.2.2",
   "description": "Convert currencies on any webpage. Auto-detects prices and shows conversions. Supports 170+ currencies with real-time rates.",
   "permissions": [
-    "activeTab",
     "storage",
-    "tabs",
     "contextMenus",
     "alarms"
   ],
