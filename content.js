@@ -3864,7 +3864,7 @@ function convertPrices() {
           const text = node.textContent.trim();
 
           // Use imported regex pattern if available, otherwise fallback to inline
-          const hasCurrencyPattern = HAS_CURRENCY_REGEX || /[$€£¥₹₪₽₩฿₺₣₱₫₴]|zł|Kč|(?<![A-Za-z])(?:Ft|lei)(?![A-Za-z])|\b(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b/i;
+          const hasCurrencyPattern = HAS_CURRENCY_REGEX || /[$€£¥₹₪₽₩฿₺₣₱₫₴]|zł|Kč|(?<![A-Za-z])(?:Ft|lei)(?![A-Za-z])|\b(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b|\b(?:usd|eur|gbp|jpy|inr|ils|cad|aud|chf|cny|brl|rub|krw|thb|try|zar|sek|nok|dkk|pln|czk|huf|mxn|nzd|sgd|hkd|twd|aed|sar|php|vnd|uah|ron|isk|kwd|qar|egp)\b/;
 
           // Accept if text has currency symbol/code AND contains digits
           if (hasCurrencyPattern.test(text) && /\d/.test(text)) {
