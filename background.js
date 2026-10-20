@@ -40,7 +40,68 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 let exchangeRates = {};
 let lastUpdateTime = 0;
-const UPDATE_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours (1 day)
+const DEFAULT_UPDATE_INTERVAL_MINUTES = 1440; // 24 hours (1 day)
+const MIN_UPDATE_INTERVAL_MINUTES = 30;
+const RATE_REFRESH_ALARM = 'refreshExchangeRates';
+const RETRY_AFTER_FAILURE_MS = 15 * 60 * 1000; // 15 minutes
+let lastFailureTime = 0;
+let pendingUpdate = null; // In-flight rate update shared by concurrent callers
+
+// The service worker is stopped when idle, so in-memory rates are lost.
+// Restore the last fetched rates from local storage on every startup.
+const cachedRatesLoaded = (async () => {
+  try {
+    const cached = await chrome.storage.local.get(['exchangeRates', 'lastUpdate']);
+    if (cached.exchangeRates && Object.keys(cached.exchangeRates).length > 0) {
+      exchangeRates = cached.exchangeRates;
+      lastUpdateTime = cached.lastUpdate || 0;
+      log(`💾 Restored ${Object.keys(exchangeRates).length} cached rates`);
+    }
+  } catch (error) {
+    logError('Failed to restore cached rates:', error);
+  }
+})();
+
+// Read the user's refresh interval (stored in minutes)
+async function getUpdateIntervalMinutes() {
+  const { updateInterval } = await chrome.storage.sync.get(['updateInterval']);
+  const minutes = parseInt(updateInterval, 10) || DEFAULT_UPDATE_INTERVAL_MINUTES;
+  return Math.max(minutes, MIN_UPDATE_INTERVAL_MINUTES);
+}
+
+// Schedule periodic background refreshes that honor the user's interval
+async function scheduleRateRefresh() {
+  const periodInMinutes = await getUpdateIntervalMinutes();
+  await chrome.alarms.create(RATE_REFRESH_ALARM, {
+    delayInMinutes: periodInMinutes,
+    periodInMinutes
+  });
+  log(`⏰ Rate refresh scheduled every ${periodInMinutes} minutes`);
+}
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === RATE_REFRESH_ALARM) {
+    updateExchangeRates();
+  }
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  scheduleRateRefresh();
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'sync') return;
+
+  if (changes.updateInterval) {
+    scheduleRateRefresh();
+  }
+
+  // A different provider or key means the cached rates are no longer current
+  if (changes.apiProvider || changes.apiKey) {
+    lastUpdateTime = 0;
+    updateExchangeRates(true);
+  }
+});
 
 // ⭐ SMART DEFAULTS: Native HTML title tooltips ON by default
 const DEFAULT_SETTINGS = {
@@ -82,6 +143,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   }
 
   updateExchangeRates();
+  scheduleRateRefresh();
 
   // Create context menu for currency conversion
   createContextMenu();
@@ -431,7 +493,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     // Ensure we have rates
     if (Object.keys(exchangeRates).length === 0) {
       log('⏳ Loading exchange rates...');
-      await updateExchangeRates(true);
+      await updateExchangeRates();
     }
 
     // Convert
@@ -473,11 +535,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 // Every provider returns a map of "units of currency per 1 USD".
 // Providers that use a different base (EUR, ILS) are rebased to USD.
 const DEFAULT_PROVIDER = 'exchangerate-api';
-
-// Providers that existed in older versions but no longer work
-// (dead endpoints or unsupported authentication). Users who had one of
-// these selected are migrated to the default provider.
-const REMOVED_PROVIDERS = ['exchangerates-api', 'xe'];
 
 const API_PROVIDERS = {
   'exchangerate-api': {
@@ -595,7 +652,8 @@ function resolveProviderId(provider) {
   return API_PROVIDERS[provider] ? provider : DEFAULT_PROVIDER;
 }
 
-// Move users whose stored provider was removed to the default provider
+// Move users whose stored provider was removed (e.g. the dead
+// 'exchangerates-api' endpoint or 'xe') to the default provider
 async function migrateRemovedProvider() {
   const { apiProvider } = await chrome.storage.sync.get(['apiProvider']);
   if (apiProvider && !API_PROVIDERS[apiProvider]) {
@@ -702,11 +760,32 @@ async function fetchCryptoRates() {
 
 // Update exchange rates
 async function updateExchangeRates(forceUpdate = false) {
+  // Make sure rates cached by a previous service worker instance are loaded
+  await cachedRatesLoaded;
+
   const now = Date.now();
-  if (!forceUpdate && now - lastUpdateTime < UPDATE_INTERVAL && Object.keys(exchangeRates).length > 0) {
+  const intervalMs = (await getUpdateIntervalMinutes()) * 60 * 1000;
+  const hasRates = Object.keys(exchangeRates).length > 0;
+  if (!forceUpdate && hasRates && now - lastUpdateTime < intervalMs) {
     return { success: true, cached: true };
   }
+  // After a failed request, keep serving cached rates for a while instead of
+  // retrying on every page load
+  if (!forceUpdate && hasRates && now - lastFailureTime < RETRY_AFTER_FAILURE_MS) {
+    return { success: false, cached: true, error: 'Waiting before retrying the rate provider' };
+  }
 
+  // Share one network request between concurrent callers (e.g. many tabs loading)
+  if (!pendingUpdate) {
+    pendingUpdate = fetchAndStoreRates(now).finally(() => {
+      pendingUpdate = null;
+    });
+  }
+  return pendingUpdate;
+}
+
+// Fetch fresh rates from the selected provider and persist them
+async function fetchAndStoreRates(now) {
   try {
     // Get user settings
     const settings = await chrome.storage.sync.get(['apiProvider', 'apiKey']);
@@ -779,6 +858,7 @@ async function updateExchangeRates(forceUpdate = false) {
 
   } catch (error) {
     logError('Failed to update exchange rates:', error);
+    lastFailureTime = now;
 
     // Try to load cached rates as fallback
     try {

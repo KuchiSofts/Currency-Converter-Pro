@@ -417,6 +417,7 @@ function setupEventListeners() {
   // Auto-save on certain changes
   const autoSaveElements = [
     'updateInterval', 'highlightPrices', // Removed defaultTargetCurrency (handled above)
+    'apiProvider', 'apiKey',
     'showInlineConversion', 'replacePrice',
     // Popup visibility settings
     'showStatsBar', 'showFavorites', 'showActions', 'showQuickToggles', 'showFooterLinks',
@@ -530,8 +531,7 @@ async function saveSettings() {
       // Ignore tab messaging errors
     }
 
-    // Clear cached rates if API provider changed
-    await chrome.storage.local.remove(['exchangeRates', 'lastUpdate']);
+    // Rates are refetched by the background script when the provider or key changes
 
   } catch (error) {
     console.error('Failed to save settings:', error);

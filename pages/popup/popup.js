@@ -113,11 +113,11 @@ function setupEventListeners() {
   fromAmount.addEventListener('input', debounce(convertCurrency, 300));
   fromCurrency.addEventListener('change', () => {
     convertCurrency();
-    loadExchangeRates(true); // Auto-refresh rates when currency changes
+    loadExchangeRates(); // Uses cached rates; background refreshes when stale
   });
   toCurrency.addEventListener('change', () => {
     convertCurrency();
-    loadExchangeRates(true); // Auto-refresh rates when currency changes
+    loadExchangeRates(); // Uses cached rates; background refreshes when stale
   });
 
   // Swap currencies
