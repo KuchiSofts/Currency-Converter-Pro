@@ -416,9 +416,23 @@ function applyPreservedStyles(element, styles) {
   element.style.textTransform = styles.textTransform;
 }
 
+// Format a converted amount with the user's decimal places and thousands separator
+function formatConvertedAmount(amount, currency) {
+  let formatted = amount.toFixed(getSmartDecimals(currency));
+
+  if (settings.useThousandSeparator) {
+    const parts = formatted.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    formatted = parts.join('.');
+  }
+
+  return formatted;
+}
+
 // ⭐ Helper function to generate converted text with currency code preservation
 function generateConvertedText(originalPrice, convertedAmount, targetCurrency) {
   const targetSymbol = getCurrencySymbol(targetCurrency);
+  const amountText = formatConvertedAmount(convertedAmount, targetCurrency);
 
   // Preserve leading/trailing whitespace
   const leadingSpace = (originalPrice || '').match(/^\s*/)[0];
@@ -455,22 +469,28 @@ function generateConvertedText(originalPrice, convertedAmount, targetCurrency) {
 
   let result;
 
-  if (hasFullCode && !hasSymbol) {
+  if (settings.currencyDisplay === 'code') {
+    // User chose codes: "1,234.56 ILS"
+    result = `${amountText} ${targetCurrency}`;
+  } else if (settings.currencyDisplay === 'both') {
+    // User chose symbol and code: "₪1,234.56 ILS"
+    result = `${targetSymbol}${amountText} ${targetCurrency}`;
+  } else if (hasFullCode && !hasSymbol) {
     // ⭐ Structure: CODE + NUMBER (no symbol)
     // "USD 663.92" → "ILS 2111.27" (letters to letters, numbers to numbers)
-    result = `${targetCurrency} ${convertedAmount.toFixed(2)}`;
+    result = `${targetCurrency} ${amountText}`;
     log(`   → CODE ONLY: "${result}"`);
   } else if (hasShortCodeWithSymbol) {
     // ⭐ Structure: CODE + SYMBOL + NUMBER
     // "US $ 9.11" → "ILS ₪ 6.33" (with space) | "US $9.11" → "ILS ₪6.33" (no space)
     const spacer = hasSpaceAfterSymbol ? ' ' : '';
-    result = `${targetCurrency} ${targetSymbol}${spacer}${convertedAmount.toFixed(2)}`;
+    result = `${targetCurrency} ${targetSymbol}${spacer}${amountText}`;
     log(`   → CODE + SYMBOL: "${result}"`);
   } else {
     // ⭐ Structure: SYMBOL + NUMBER (no code)
     // "$ 1.99" → "₪ 6.33" (with space) | "$1.99" → "₪6.33" (no space)
     const spacer = hasSpaceAfterSymbol ? ' ' : '';
-    result = `${targetSymbol}${spacer}${convertedAmount.toFixed(2)}`;
+    result = `${targetSymbol}${spacer}${amountText}`;
     log(`   → SYMBOL ONLY: "${result}"`);
   }
 
@@ -2423,6 +2443,9 @@ function setupPriceContextMenu(element) {
 
 // Apply conversion to element
 function applyConversion(element, amount, sourceCurrency, convertedAmount, targetCurrency) {
+  // Skip prices outside the user's minimum/maximum threshold
+  if (!isPriceInRange(amount)) return;
+
   const targetSymbol = getCurrencySymbol(targetCurrency);
   const sourceSymbol = getCurrencySymbol(sourceCurrency);
 
@@ -2468,7 +2491,7 @@ function applyConversion(element, amount, sourceCurrency, convertedAmount, targe
       // Normalize whitespace in converted text (remove tabs, extra spaces)
       const normalizedText = convertedText.replace(/\s+/g, ' ').trim();
       // Check if convertedText already has currency code to avoid duplication
-      const alreadyHasCode = normalizedText.startsWith(targetCurrency);
+      const alreadyHasCode = normalizedText.split(' ').includes(targetCurrency);
       element.title = alreadyHasCode ? normalizedText : `${normalizedText} ${targetCurrency}`;
       log('   Added native HTML title attribute (zero conflicts, universal support)');
     }
@@ -2485,7 +2508,7 @@ function applyConversion(element, amount, sourceCurrency, convertedAmount, targe
   setupPriceContextMenu(element);
 
   // Log conversion - avoid duplication if convertedText already has currency code
-  const alreadyHasCode = convertedText.trim().startsWith(targetCurrency);
+  const alreadyHasCode = convertedText.trim().split(/\s+/).includes(targetCurrency);
   const logText = alreadyHasCode ? convertedText : `${convertedText} ${targetCurrency}`;
   log(`✅ ${sourceSymbol}${amount} ${sourceCurrency} → ${logText}`);
 }
