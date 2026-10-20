@@ -182,7 +182,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     logError('Failed to migrate API provider:', error);
   }
 
-  updateExchangeRates();
+  // Always fetch fresh rates after install/update - rates cached by an older
+  // version may come from a removed provider or an old parser
+  updateExchangeRates(true);
   scheduleRateRefresh();
 
   // Create context menu for currency conversion
