@@ -469,6 +469,29 @@ body {
   flex-shrink: 0;
 }
 
+/* Data source attribution (required by the rate providers) */
+.attribution {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.85rem 0.3rem;
+  background: var(--color-bg-secondary);
+  font-size: 0.55rem;
+  color: var(--color-text-tertiary);
+  width: 100%;
+  box-sizing: border-box;
+}
+.attribution a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.attribution a:hover,
+.attribution a:focus-visible {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 /* Stats Bar */
 .stats-bar {
   display: flex;

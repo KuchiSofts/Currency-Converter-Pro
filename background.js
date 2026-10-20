@@ -347,23 +347,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'getExchangeRates') {
     updateExchangeRates(request.forceUpdate).then(async (updateResult) => {
       // Get formatted time from storage
-      const cache = await chrome.storage.local.get(['lastUpdateFormatted', 'apiKeyWarning']);
+      const cache = await chrome.storage.local.get(['lastUpdateFormatted', 'apiKeyWarning', 'rateProvider']);
 
       sendResponse({
         rates: exchangeRates,
         updateResult,
         lastUpdate: lastUpdateTime,
         lastUpdateFormatted: cache.lastUpdateFormatted || 'Unknown',
-        apiKeyWarning: cache.apiKeyWarning
+        apiKeyWarning: cache.apiKeyWarning,
+        provider: cache.rateProvider || DEFAULT_PROVIDER
       });
     }).catch(async (error) => {
-      const cache = await chrome.storage.local.get(['lastUpdateFormatted']);
+      const cache = await chrome.storage.local.get(['lastUpdateFormatted', 'rateProvider']);
 
       sendResponse({
         rates: exchangeRates,
         error: error.message,
         lastUpdate: lastUpdateTime,
-        lastUpdateFormatted: cache.lastUpdateFormatted || 'Unknown'
+        lastUpdateFormatted: cache.lastUpdateFormatted || 'Unknown',
+        provider: cache.rateProvider || DEFAULT_PROVIDER
       });
     });
     return true; // Keep channel open for async response

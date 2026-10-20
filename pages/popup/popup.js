@@ -245,10 +245,31 @@ async function loadExchangeRates(forceUpdate = false) {
     }
 
     updateRateInfo(response.lastUpdateFormatted);
+    updateRateAttribution(response.provider);
 
   } catch (error) {
     console.error('Failed to load exchange rates:', error);
   }
+}
+
+// Credit the data source that supplied the current rates
+const PROVIDER_CREDITS = {
+  'exchangerate-api': { text: 'Rates By Exchange Rate API', url: 'https://www.exchangerate-api.com' },
+  'ecb': { text: 'Rates: ECB via Frankfurter', url: 'https://frankfurter.dev' },
+  'bank-of-israel': { text: 'Rates: Bank of Israel', url: 'https://www.boi.org.il' },
+  'openexchangerates': { text: 'Rates: Open Exchange Rates', url: 'https://openexchangerates.org' },
+  'currencyapi': { text: 'Rates: CurrencyAPI', url: 'https://currencyapi.com' },
+  'fixer': { text: 'Rates: Fixer.io', url: 'https://fixer.io' },
+  'currencylayer': { text: 'Rates: CurrencyLayer', url: 'https://currencylayer.com' }
+};
+
+function updateRateAttribution(provider) {
+  const link = document.getElementById('rateAttributionLink');
+  if (!link) return;
+
+  const credit = PROVIDER_CREDITS[provider] || PROVIDER_CREDITS['exchangerate-api'];
+  link.textContent = credit.text;
+  link.href = credit.url;
 }
 
 async function convertCurrency() {

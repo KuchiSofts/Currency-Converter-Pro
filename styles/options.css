@@ -1052,6 +1052,36 @@ input[type="number"].text-input::-webkit-inner-spin-button {
 }
 
 /* About Links */
+.about-sources {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.about-sources-title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.about-sources ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.about-sources a {
+  color: var(--color-primary);
+}
+
+.about-sources-note {
+  margin: var(--space-2) 0 0;
+  font-size: 0.8rem;
+}
+
 .about-links {
   display: flex;
   gap: var(--space-3);
