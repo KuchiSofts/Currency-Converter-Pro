@@ -855,6 +855,9 @@ async function fetchAndStoreRates(now) {
           timestamp: now
         }
       });
+    } else {
+      // The selected provider can be used again - drop any earlier warning
+      await chrome.storage.local.remove('apiKeyWarning');
     }
 
     const activeProvider = API_PROVIDERS[provider];
