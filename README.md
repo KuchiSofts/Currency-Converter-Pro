@@ -26,7 +26,7 @@ Currency Converter Pro is a lightweight Chrome extension that finds prices on an
   - Currency codes: `USD 49.99`, `100 GBP`
   - Symbols after the amount: `12,99 zł`, `100 Kč`, `1 500 Ft`, `45 lei`
   - Ranges: `$10-$20`, `US $10 - 11.90`
-  - Abbreviations: `$5k`, `€2.5M`, `£1.2B`
+  - Abbreviations: `$5k`, `€2.5M`, `£750k`
   - Unit prices and qualifiers: `$5 each`, `from $20`, `approximately €100`
   - Cryptocurrencies: `0.001 BTC`, `1.5 ETH`, `100 USDT`
 - Handles **fragmented prices** split across several HTML elements, as on Amazon, AliExpress and Newegg.
