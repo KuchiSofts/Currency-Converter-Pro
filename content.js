@@ -2019,8 +2019,9 @@ function extractAmount(text, currency, element = null) {
   }
 
   // ⭐ SMART: Check for abbreviated amounts first (k/M/B/T)
-  // Matches: $5k, €2.5M, £1.2B, ¥100K, $3.5T
-  const abbreviatedMatch = text.match(/([€£¥₹₪₽₩฿₺₣₱₫₴\$]|USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY)\s*(\d+(?:[.,]\d+)?)\s*([KkMmBbTt])\b/i);
+  // Matches: $5k, €2.5M, £1.2B, ¥100K, $3.5T, and with the currency after: 1.5k USD, 2M €
+  const abbreviatedMatch = text.match(/([€£¥₹₪₽₩฿₺₣₱₫₴\$]|USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY)\s*(\d+(?:[.,]\d+)?)\s*([KkMmBbTt])\b/i) ||
+    text.match(/(^|[^\d.,])(\d+(?:[.,]\d+)?)\s*([KkMmBb])\s*(?:[€£¥₹₪₽₩฿₺₣₱₫₴\$]|(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY)\b)/i);
 
   if (abbreviatedMatch) {
     const baseAmount = parseFloat(abbreviatedMatch[2].replace(',', '.'));
