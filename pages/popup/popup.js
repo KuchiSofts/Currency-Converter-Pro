@@ -665,14 +665,26 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       document.body.style.maxWidth = scaledWidth + 'px';
     }
 
-    // Handle default currency changes
-    if (changes.defaultTargetCurrency) {
-      document.getElementById('toCurrency').value = changes.defaultTargetCurrency.newValue;
-      convertCurrency();
+    // Handle default currency changes made elsewhere (e.g. the settings page).
+    // The popup saves these itself after each conversion, so skip changes the
+    // selects already show - converting again would log a duplicate history entry
+    const toCurrencySelect = document.getElementById('toCurrency');
+    const fromCurrencySelect = document.getElementById('fromCurrency');
+    const newTarget = changes.defaultTargetCurrency && changes.defaultTargetCurrency.newValue;
+    const newSource = changes.defaultSourceCurrency && changes.defaultSourceCurrency.newValue;
+    let currencyChanged = false;
+
+    if (newTarget && toCurrencySelect.value !== newTarget) {
+      toCurrencySelect.value = newTarget;
+      currencyChanged = true;
     }
 
-    if (changes.defaultSourceCurrency) {
-      document.getElementById('fromCurrency').value = changes.defaultSourceCurrency.newValue;
+    if (newSource && fromCurrencySelect.value !== newSource) {
+      fromCurrencySelect.value = newSource;
+      currencyChanged = true;
+    }
+
+    if (currencyChanged) {
       convertCurrency();
     }
 
