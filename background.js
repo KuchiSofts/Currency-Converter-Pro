@@ -217,8 +217,9 @@ async function createContextMenu() {
 function detectCurrencyInText(text) {
   if (!text || text.length > 100) return null;
 
-  // Check for currency codes first (more reliable)
-  const codeMatch = text.match(/(\d[\d,.\s]+)\s*(USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b/i);
+  // Check for currency codes first (more reliable), after or before the amount
+  const codeMatch = text.match(/(\d[\d,.\s]*)\s*(USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b/i) ||
+    text.match(/()\b(USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\s*\d/i);
   if (codeMatch) {
     return codeMatch[2].toUpperCase();
   }
@@ -232,19 +233,19 @@ function detectCurrencyInText(text) {
   if (text.includes('R$')) return 'BRL';
   if (text.includes('NT$')) return 'TWD';
 
-  // Check for other currency symbols
-  if (/€\s*\d/.test(text)) return 'EUR';
-  if (/£\s*\d/.test(text)) return 'GBP';
-  if (/₹\s*\d/.test(text)) return 'INR';
-  if (/₪\s*\d/.test(text)) return 'ILS';
-  if (/₽\s*\d/.test(text)) return 'RUB';
-  if (/₩\s*\d/.test(text)) return 'KRW';
-  if (/฿\s*\d/.test(text)) return 'THB';
-  if (/₺\s*\d/.test(text)) return 'TRY';
-  if (/₣\s*\d/.test(text)) return 'CHF';
-  if (/₱\s*\d/.test(text)) return 'PHP';
-  if (/₫\s*\d/.test(text)) return 'VND';
-  if (/₴\s*\d/.test(text)) return 'UAH';
+  // Check for other currency symbols, before or after the amount ("€12", "12,99 €")
+  if (/€\s*\d|\d\s*€/.test(text)) return 'EUR';
+  if (/£\s*\d|\d\s*£/.test(text)) return 'GBP';
+  if (/₹\s*\d|\d\s*₹/.test(text)) return 'INR';
+  if (/₪\s*\d|\d\s*₪/.test(text)) return 'ILS';
+  if (/₽\s*\d|\d\s*₽/.test(text)) return 'RUB';
+  if (/₩\s*\d|\d\s*₩/.test(text)) return 'KRW';
+  if (/฿\s*\d|\d\s*฿/.test(text)) return 'THB';
+  if (/₺\s*\d|\d\s*₺/.test(text)) return 'TRY';
+  if (/₣\s*\d|\d\s*₣/.test(text)) return 'CHF';
+  if (/₱\s*\d|\d\s*₱/.test(text)) return 'PHP';
+  if (/₫\s*\d|\d\s*₫/.test(text)) return 'VND';
+  if (/₴\s*\d|\d\s*₴/.test(text)) return 'UAH';
 
   // Symbols after number
   if (/\d\s*zł/.test(text)) return 'PLN';
@@ -259,8 +260,8 @@ function detectCurrencyInText(text) {
   if (text.includes('﷼')) return 'SAR';
 
   // Generic dollar sign (check last, after multi-char variants)
-  if (/\$\s*\d/.test(text)) return 'USD';
-  if (/¥\s*\d/.test(text)) return 'JPY'; // Could be CNY
+  if (/\$\s*\d|\d\s*\$/.test(text)) return 'USD';
+  if (/¥\s*\d|\d\s*¥/.test(text)) return 'JPY'; // Could be CNY
 
   return null;
 }
