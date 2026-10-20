@@ -42,21 +42,37 @@ let exchangeRates = {};
 let lastUpdateTime = 0;
 const UPDATE_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours (1 day)
 
-// Initialize extension
-chrome.runtime.onInstalled.addListener(() => {
+// ⭐ SMART DEFAULTS: Native HTML title tooltips ON by default
+const DEFAULT_SETTINGS = {
+  defaultTargetCurrency: 'ILS',
+  highlightPrices: false,
+  showInlineConversion: true,       // Native HTML title attribute ON by default ⭐
+  replacePrice: false,
+  apiProvider: 'exchangerate-api',
+  apiKey: '',
+  updateInterval: 1440,
+  debugMode: false                  // Debug mode OFF by default
+};
 
-  // Set default settings for first-time installation
-  // ⭐ SMART DEFAULTS: Native HTML title tooltips ON by default
-  chrome.storage.sync.set({
-    defaultTargetCurrency: 'ILS',
-    highlightPrices: false,
-    showInlineConversion: true,       // Native HTML title attribute ON by default ⭐
-    replacePrice: false,
-    apiProvider: 'exchangerate-api',
-    apiKey: '',
-    updateInterval: 1440,
-    debugMode: false                  // Debug mode OFF by default
-  });
+// Initialize extension
+chrome.runtime.onInstalled.addListener(async (details) => {
+  // Only fill in settings that are missing - never overwrite the user's
+  // choices when the extension is updated or reloaded
+  try {
+    const existing = await chrome.storage.sync.get(Object.keys(DEFAULT_SETTINGS));
+    const missing = {};
+    for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+      if (existing[key] === undefined) {
+        missing[key] = value;
+      }
+    }
+    if (Object.keys(missing).length > 0) {
+      await chrome.storage.sync.set(missing);
+      log(`⚙️ Applied ${Object.keys(missing).length} default settings (${details.reason})`);
+    }
+  } catch (error) {
+    logError('Failed to apply default settings:', error);
+  }
 
   updateExchangeRates();
 
