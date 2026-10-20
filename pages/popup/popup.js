@@ -406,15 +406,11 @@ async function updateStatsBar() {
     // Update current theme
     const currentTheme = document.getElementById('currentTheme');
     if (currentTheme) {
-      const themeNames = {
-        'default': 'Default',
-        'dark': 'Dark',
-        'light': 'Light',
-        'blue': 'Blue',
-        'green': 'Green',
-        'purple': 'Purple'
-      };
-      currentTheme.textContent = themeNames[settings.selectedTheme || 'default'] || 'Default';
+      // Short name from the theme list, e.g. "🌊 Ocean - Teal & Aqua" -> "Ocean"
+      const themeId = settings.selectedTheme || 'chrome-dark';
+      const themes = window.themeManager ? window.themeManager.getAvailableThemes() : [];
+      const theme = themes.find(t => t.id === themeId);
+      currentTheme.textContent = theme ? theme.name.replace(/^\S+\s+/, '').split(' - ')[0] : 'Chrome Dark';
     }
 
     // Update quick toggles
