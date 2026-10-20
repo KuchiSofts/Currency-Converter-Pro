@@ -2036,27 +2036,27 @@ function extractAmount(text, currency, element = null) {
   // Common price patterns (more comprehensive)
   const patterns = [
     // US dollar: US $123.45, US$123.45
-    /US\s*\$\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/i,
+    /US\s*\$\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/i,
     // Symbol before number: $123.45, €123,45, €12,99
-    /[€£¥₹₪₽₩฿₺₣₱₫₴]\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /[€£¥₹₪₽₩฿₺₣₱₫₴]\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/,
     // Multi-char symbols: C$123.45, A$123.45
-    /[CANZHSR]\$\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /[CANZHSR]\$\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/,
     // NT$ symbol
-    /NT\$\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /NT\$\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/,
     // Symbol after number: 123.45zł, 123Ft
-    /(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)\s*(?:zł|Kč|Ft|lei|kr)/,
+    /((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)\s*(?:zł|Kč|Ft|lei|kr)/,
     // Dollar sign (various types)
-    /\$\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /\$\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/,
     // Currency code: 123.45 USD, USD 123.45
-    /(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?/i,
+    /(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?/i,
     // Arabic/special symbols
-    /(?:د\.إ|﷼)\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /(?:د\.إ|﷼)\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/,
     // Fragmented price pattern (for AliExpress): "US $" followed by digits split across elements
     /US\s*\$?\s*(\d+)\s*\.?\s*(\d+)/i,
     // Just currency symbol followed by fragmented numbers
     /\$\s*(\d+)\s*\.?\s*(\d+)/,
     // Price with just numbers (last resort)
-    /(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/
+    /((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/
   ];
 
   for (const pattern of patterns) {
@@ -2139,7 +2139,7 @@ function detectClickedPrice(element, event) {
     // Currency symbol OR code BEFORE number
     '(?:([\\$€£¥₹₪₽₩฿₺₣₱₫₴]|USD|EUR|GBP|JPY|CNY|INR|ILS|CAD|AUD|CHF|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\\s*)?' +
     // The number with optional separators
-    '(\\d{1,3}(?:[,.]\\d{3})*(?:[.,]\\d{1,2})?)' +
+    '((?:\\d{1,3}(?:[,.]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?)' +
     // Currency code AFTER number (optional)
     '(?:\\s*(?:USD|EUR|GBP|JPY|CNY|INR|ILS|CAD|AUD|CHF|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP))?',
     'gi'
@@ -4772,7 +4772,7 @@ function convertClickedPrice() {
 
   // Extract ONLY the price pattern (currency + amount) from the original text
   // Enhanced regex to support BOTH symbols ($, €, £) AND codes (USD, EUR, GBP)
-  const pricePatternRegex = /(?:(?:US|HK|NZ|AU|CA|SG|C|A|NZ|HK|S)\s*)?(?:[\$€£¥₹₪₽₩฿₺₣₱₫₴]|USD|EUR|GBP|JPY|CNY|INR|ILS|CAD|AUD|CHF|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/gi;
+  const pricePatternRegex = /(?:(?:US|HK|NZ|AU|CA|SG|C|A|NZ|HK|S)\s*)?(?:[\$€£¥₹₪₽₩฿₺₣₱₫₴]|USD|EUR|GBP|JPY|CNY|INR|ILS|CAD|AUD|CHF|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\s*((?:\d{1,3}(?:[,.\s]\d{3})+|\d+)(?:[.,]\d{1,2})?)/gi;
 
   // Find all currency patterns in the original text
   const matches = Array.from(originalPrice.matchAll(pricePatternRegex));
@@ -4914,13 +4914,13 @@ function replaceSelectedText(data) {
     // Find the price pattern in the selected text
     const pricePatterns = [
       // Symbol before number
-      new RegExp(`[€£¥₹₪₽₩฿₺₣₱₫₴$]\\s*\\d{1,3}(?:[,.\\s]\\d{3})*(?:[.,]\\d{1,2})?`, 'g'),
+      new RegExp(`[€£¥₹₪₽₩฿₺₣₱₫₴$]\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?`, 'g'),
       // Multi-char symbols
-      new RegExp(`[CANZHSR]\\$\\s*\\d{1,3}(?:[,.\\s]\\d{3})*(?:[.,]\\d{1,2})?`, 'g'),
+      new RegExp(`[CANZHSR]\\$\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?`, 'g'),
       // Symbol after number
-      new RegExp(`\\d{1,3}(?:[,.\\s]\\d{3})*(?:[.,]\\d{1,2})?\\s*(?:zł|Kč|Ft|lei|kr)`, 'gi'),
+      new RegExp(`(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?\\s*(?:zł|Kč|Ft|lei|kr)`, 'gi'),
       // Currency code with number
-      new RegExp(`(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\\s*\\d{1,3}(?:[,.\\s]\\d{3})*(?:[.,]\\d{1,2})?\\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?`, 'gi')
+      new RegExp(`(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?\\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?`, 'gi')
     ];
 
     let priceMatch = null;
