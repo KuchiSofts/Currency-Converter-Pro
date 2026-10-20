@@ -160,28 +160,22 @@ function setupEventListeners() {
     editFavoritesBtn.addEventListener('click', editFavorites);
   }
 
-  // Quick toggles
-  const quickToggleTooltip = document.getElementById('quickToggleTooltip');
-  const quickToggleHighlight = document.getElementById('quickToggleHighlight');
-  const quickToggleAuto = document.getElementById('quickToggleAuto');
+  // Quick toggles - each maps to a setting the content script reads
+  const quickToggles = {
+    quickToggleTooltip: 'showInlineConversion',
+    quickToggleHighlight: 'highlightPrices',
+    quickToggleReplace: 'replacePrice'
+  };
 
-  if (quickToggleTooltip) {
-    quickToggleTooltip.addEventListener('change', async () => {
-      await chrome.storage.sync.set({ showTooltip: quickToggleTooltip.checked });
-    });
-  }
+  Object.entries(quickToggles).forEach(([elementId, settingKey]) => {
+    const toggle = document.getElementById(elementId);
+    if (!toggle) return;
 
-  if (quickToggleHighlight) {
-    quickToggleHighlight.addEventListener('change', async () => {
-      await chrome.storage.sync.set({ highlightPrices: quickToggleHighlight.checked });
+    toggle.addEventListener('change', async () => {
+      await chrome.storage.sync.set({ [settingKey]: toggle.checked });
+      await notifyTabsSettingsUpdated();
     });
-  }
-
-  if (quickToggleAuto) {
-    quickToggleAuto.addEventListener('change', async () => {
-      await chrome.storage.sync.set({ autoConvertOnHover: quickToggleAuto.checked });
-    });
-  }
+  });
 
   // Footer links
   const fullSettingsBtn = document.getElementById('fullSettingsBtn');
@@ -390,9 +384,9 @@ function updateRateInfo(lastUpdateFormatted = null) {
 async function updateStatsBar() {
   try {
     const settings = await chrome.storage.sync.get([
-      'showTooltip',
+      'showInlineConversion',
       'highlightPrices',
-      'autoConvertOnHover',
+      'replacePrice',
       'selectedTheme'
     ]);
 
@@ -424,18 +418,19 @@ async function updateStatsBar() {
     }
 
     // Update quick toggles
+    // Defaults match the content script: tooltips ON, highlight/replace OFF
     const quickToggleTooltip = document.getElementById('quickToggleTooltip');
     const quickToggleHighlight = document.getElementById('quickToggleHighlight');
-    const quickToggleAuto = document.getElementById('quickToggleAuto');
+    const quickToggleReplace = document.getElementById('quickToggleReplace');
 
     if (quickToggleTooltip) {
-      quickToggleTooltip.checked = settings.showTooltip !== undefined ? settings.showTooltip : true;
+      quickToggleTooltip.checked = settings.showInlineConversion !== undefined ? settings.showInlineConversion : true;
     }
     if (quickToggleHighlight) {
-      quickToggleHighlight.checked = settings.highlightPrices !== undefined ? settings.highlightPrices : true;
+      quickToggleHighlight.checked = settings.highlightPrices || false;
     }
-    if (quickToggleAuto) {
-      quickToggleAuto.checked = settings.autoConvertOnHover || false;
+    if (quickToggleReplace) {
+      quickToggleReplace.checked = settings.replacePrice || false;
     }
   } catch (error) {
     console.error('Failed to update stats bar:', error);
@@ -628,6 +623,20 @@ function showRateComparison() {
   });
 
   alert(comparisonText);
+}
+
+// Ask open pages to reload settings and re-scan prices
+async function notifyTabsSettingsUpdated() {
+  try {
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, { type: 'settingsUpdated' }).catch(() => {
+        // Ignore tabs without the content script
+      });
+    });
+  } catch (error) {
+    console.error('Failed to notify tabs of settings change:', error);
+  }
 }
 
 // Utility function for debouncing input
