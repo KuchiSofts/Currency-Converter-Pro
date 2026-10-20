@@ -3456,13 +3456,21 @@ function detectPricesFromCrypto() {
     }
 
     // Use the CRYPTO_PRICE_REGEX from lib/regex.js
-    const match = text.match(window.PriceRegex.CRYPTO_PRICE_REGEX);
+    const cryptoRegex = window.PriceRegex.CRYPTO_PRICE_REGEX;
+    const match = text.match(cryptoRegex);
     if (!match) {
       skipped++;
       continue;
     }
 
-    const amount = parseFloat(match[1]);
+    // Let the innermost element that holds the price handle it, so a parent
+    // never overwrites its children's markup
+    if (Array.from(element.children).some(child => cryptoRegex.test(child.textContent || ''))) {
+      skipped++;
+      continue;
+    }
+
+    const amount = parseFloat(match[1].replace(/,/g, ''));
     const cryptoCode = match[2].toUpperCase();
 
     log(`💰 Crypto detected: ${amount} ${cryptoCode}`);
@@ -3522,17 +3530,17 @@ function detectPricesFromCrypto() {
 
     // Apply conversion based on display mode
     if (settings.replacePrice) {
-      // Replace mode: "₪185,123.45 ILS (was 1.5 ETH)"
-      element.textContent = `${convertedText} (was ${amount} ${cryptoCode})`;
+      // Replace mode: only the crypto amount is replaced, e.g.
+      // "Send 1.5 ETH" -> "Send ₪185,123.45 ILS (was 1.5 ETH)"
+      element.textContent = text.replace(match[0], `${convertedText} (was ${amount} ${cryptoCode})`);
       element.title = `Original: ${amount} ${cryptoCode}`;
       log(`✅ Replaced crypto price: ${amount} ${cryptoCode} → ${convertedText}`);
-    } else if (settings.showInlineConversion) {
-      // Inline mode: "1.5 ETH (₪185,123.45 ILS)"
-      element.textContent = `${amount} ${cryptoCode} (${convertedText})`;
-      log(`✅ Inline crypto conversion: ${amount} ${cryptoCode} (${convertedText})`);
     } else {
-      // Tooltip mode (default): hover to see conversion
-      element.title = convertedText;
+      // Tooltip mode (default): native title, page text stays unchanged -
+      // the same as fiat prices
+      if (settings.showInlineConversion) {
+        element.title = convertedText;
+      }
 
       // Add highlight if enabled
       if (settings.highlightPrices) {
