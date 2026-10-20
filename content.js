@@ -1356,7 +1356,7 @@ function detectPriceRange(text) {
     // PRICE_RANGE_REGEX has two alternatives:
     // Alt 1 (symbol-based): [1]=specialCode1, [2]=symbol1, [3]=price1, [4]=specialCode2, [5]=symbol2, [6]=price2
     // Alt 2 (code-based): [7]=codeBefore, [8]=price1, [9]=price2, [10]=codeAfter
-    // PRICE_RANGE_TO_REGEX groups: [1]=code1, [2]=symbol1, [3]=price1, [4]=code2, [5]=symbol2, [6]=price2, [7]=codeAfter
+    // PRICE_RANGE_TO_REGEX uses the same groups, with "to" as the separator
 
     let currencyCode, currencySymbol, minPrice, maxPrice;
 
@@ -1372,12 +1372,6 @@ function detectPriceRange(text) {
       currencySymbol = ''; // No symbol in this format
       minPrice = match[8];
       maxPrice = match[9];
-    } else {
-      // PRICE_RANGE_TO_REGEX match
-      currencyCode = match[1] || match[4] || match[7];
-      currencySymbol = match[2] || match[5];
-      minPrice = match[3];
-      maxPrice = match[6];
     }
 
     log(`📊 Extracted: code="${currencyCode}", symbol="${currencySymbol}", min="${minPrice}", max="${maxPrice}"`);
@@ -1473,7 +1467,8 @@ function convertPriceRange(rangeData, targetCurrency) {
 
   // Build converted range string with symbol on both values for clarity
   // Format: "₪31.70-₪63.40 ILS" (symbol on both prices)
-  const convertedRange = `${targetSymbol}${formattedMin}${separator}${targetSymbol}${formattedMax} ${targetCurrency}`;
+  const separatorText = separator === 'to' ? ' to ' : separator;
+  const convertedRange = `${targetSymbol}${formattedMin}${separatorText}${targetSymbol}${formattedMax} ${targetCurrency}`;
 
   log(`✅ Converted range: ${sourceCurrency} ${minPrice}-${maxPrice} → ${convertedRange}`);
 
