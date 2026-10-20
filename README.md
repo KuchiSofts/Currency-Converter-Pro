@@ -1,391 +1,203 @@
+<div align="center">
+
+<img src="icons/icon-128.png" alt="Currency Converter Pro icon" width="96" height="96">
+
 # Currency Converter Pro
 
-**A powerful Chrome extension for automatic currency conversion on any webpage**
+**See every price on the web in your own currency.**
 
-Transform your international shopping experience with intelligent, real-time currency conversion. See exact prices in your preferred currency on any website - Amazon, eBay, AliExpress, and thousands more.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Manifest V3](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
+[![Version](https://img.shields.io/badge/version-3.3.0-green.svg)](manifest.json)
 
-## 🌟 Key Features
+</div>
 
-### 💱 **Intelligent Price Detection**
-- **Automatic Detection**: Scans any webpage and automatically detects prices in 170+ currencies
-- **Smart Pattern Recognition**: Recognizes multiple price formats:
-  - Standard prices: `$49.99`, `€12,50`, `£100`
-  - Special formats: `US$10`, `C$50`, `A$75`, `NZ$100`
-  - Currency codes: `USD 49.99`, `EUR 12.50`, `100 GBP`
-  - Price ranges: `$10-$20`, `€5.50-10.99`, `US$10-11.90`
-  - Abbreviated: `$5k`, `€2.5M`, `£1.2B`
-  - Per unit: `$5/kg`, `€10 each`, `£2 per item`
-  - Subscriptions: `$9.99/month`, `€50/year`
-  - Approximate: `~$50`, `approx €100`
-  - Cryptocurrencies: `0.001 BTC`, `1.5 ETH`, `100 USDT`
-- **Fragmented Price Support**: Detects prices split across multiple HTML elements (common on Amazon, AliExpress, Newegg)
-- **Context-Aware**: Understands pricing context to avoid false positives (phone numbers, dates, product codes)
-
-### 🎨 **Multiple Display Modes**
-1. **Tooltip Display** (Default - Recommended)
-   - Hover over any price to see conversion in a beautiful tooltip
-   - Native HTML title attribute - works everywhere, no compatibility issues
-   - Zero performance impact
-   - Accessible and standards-compliant
-
-2. **Inline Display**
-   - Shows conversion directly next to the original price
-   - Format: `$49.99 (₪185.46)`
-   - Real-time visual feedback
-
-3. **Price Replacement**
-   - Replaces original price with converted price
-   - Format: `₪185.46 (was $49.99)`
-   - Complete currency transformation
-
-4. **Visual Highlighting**
-   - Highlights converted prices with subtle visual effects
-   - Customizable colors based on theme
-   - Makes prices easy to spot on busy pages
-
-### 🌍 **170+ Currencies Supported**
-
-#### Major Currencies
-- **US Dollar** (USD $), **Euro** (EUR €), **British Pound** (GBP £)
-- **Japanese Yen** (JPY ¥), **Chinese Yuan** (CNY ¥)
-- **Indian Rupee** (INR ₹), **Israeli Shekel** (ILS ₪)
-- **Canadian Dollar** (CAD C$), **Australian Dollar** (AUD A$)
-- **Swiss Franc** (CHF ₣), **Swedish Krona** (SEK kr)
-
-#### Regional Currencies
-- **European**: EUR, DKK, SEK, NOK, PLN, CZK, HUF, RON, BGN, HRK, ISK, ALL, MKD, RSD, BAM
-- **Asian**: JPY, CNY, INR, KRW, THB, IDR, MYR, PHP, SGD, VND, KHR, LAK, MMK, BDT, PKR, LKR, NPR, AFN
-- **Middle Eastern**: ILS, AED, SAR, QAR, KWD, BHD, OMR, JOD, LBP, EGP, MAD, TND, DZD, LYD, IQD, SYP, YER, SDG
-- **Americas**: USD, CAD, MXN, BRL, ARS, CLP, COP, PEN, UYU, VEF, BOB, PYG, CRC, GTQ, HNL, NIO, PAB, DOP, JMD, TTD
-- **African**: ZAR, NGN, GHS, KES, TZS, UGX, XOF, XAF, ETB, MAD, EGP, MUR, NAD, BWP, MZN
-- **Cryptocurrencies**: BTC, ETH, USDT, USDC, BNB, XRP, ADA, SOL, DOGE, DOT, MATIC, LTC, BCH
-
-### 🎯 **Site-Specific Optimization**
-
-Pre-configured selectors for 25+ major e-commerce platforms:
-- **Marketplaces**: Amazon, eBay, AliExpress, Alibaba, Etsy, Rakuten, Overstock
-- **Retail**: Walmart, Target, Costco, Best Buy, Home Depot, Wayfair, IKEA
-- **Electronics**: Newegg, B&H Photo
-- **Fashion**: ASOS, Zalando, Zara, H&M, Nike, Adidas
-- **Travel**: Booking.com, Expedia
-- **Platforms**: Shopify stores, WooCommerce stores, Magento stores
-- **Generic**: Works on any website with automatic fallback detection
-
-### 📊 **Real-Time Exchange Rates**
-
-- **Multiple API Providers**: Supports 8+ exchange rate APIs for reliability
-  - ExchangeRate-API.com (default - free, no API key needed)
-  - Fixer.io, CurrencyLayer, Exchangerate.host
-  - CurrencyAPI.com, OpenExchangeRates.org, XE.com
-  - Bank of Israel (for ILS rates)
-- **Auto-Update**: Rates refresh automatically every 24 hours
-- **Manual Refresh**: Update rates on demand via popup
-- **Offline Support**: Works with cached rates when offline
-- **Custom API Keys**: Bring your own API keys for premium services
-
-### 🎨 **Beautiful Themes**
-
-14 professionally designed themes:
-1. **Chrome Dark** - Native Chrome dark mode (Default)
-2. **Dark Mode** - Discord-inspired dark theme
-3. **Blue Gradient** - Modern blue-purple gradient
-4. **Professional** - Clean corporate blue
-5. **Minimal** - Minimalist grayscale
-6. **Vibrant** - Bright orange-red gradient
-7. **Ocean** - Refreshing teal and aqua
-8. **Sunset** - Purple and pink gradient
-9. **Forest** - Calming green nature
-10. **Midnight** - Deep navy blue
-11. **Cherry** - Bold red and rose
-12. **Autumn** - Warm amber and orange
-13. **Lavender** - Soft purple
-14. **Monochrome** - High contrast B&W
-
-### ⚡ **Performance Optimized**
-
-- **Smart Caching**: Conversion cache with automatic pruning (500 item limit)
-- **Debounced Observer**: 500ms delay prevents excessive DOM scanning
-- **Element Limits**: Processes 300-500 elements per pass for smooth performance
-- **WeakSet Memory**: Automatic memory cleanup when elements removed from DOM
-- **Modular Architecture**: Separate library files for better code splitting
-- **Lazy Detection**: Only scans when necessary based on page changes
-
-### 🔒 **Privacy & Security**
-
-- **No Data Collection**: Extension doesn't collect or transmit any personal data
-- **Local Processing**: All conversions happen in your browser
-- **Secure APIs**: Only connects to reputable exchange rate APIs
-- **No Tracking**: No analytics, no user tracking, no ads
-- **Open Source**: Code is fully auditable
-
-### 🛠️ **Advanced Features**
-
-#### Context Menu Integration
-- Right-click any selected price for instant conversion
-- Smart detection of currency in selected text
-- Quick access to conversion without leaving the page
-
-#### Keyboard Shortcuts
-- Context menu accessible via right-click
-- Popup opens with browser action click
-- Full keyboard navigation support
-
-#### Conversion History
-- Saves recent conversions for quick reference
-- Configurable history limit (default: 50)
-- Clear history option available
-
-#### Debug Mode
-- Detailed logging for troubleshooting
-- Performance monitoring
-- Detection statistics
-- Can be enabled in settings
-
-#### Import/Export Settings
-- Export all your settings to JSON file
-- Import settings from backup
-- Share configurations across devices
-
-## 📥 Installation
-
-### From Chrome Web Store
-1. Visit the [Chrome Web Store](#) (link coming soon)
-2. Click "Add to Chrome"
-3. Confirm by clicking "Add extension"
-
-### Manual Installation (Developer Mode)
-1. Download or clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked"
-5. Select the extension directory
-6. Extension will appear in your toolbar
-
-## 🚀 Quick Start
-
-### Basic Usage
-1. **Install the extension** from Chrome Web Store
-2. **Click the extension icon** in your toolbar
-3. **Select your preferred currency** (e.g., ILS, EUR, USD)
-4. **Browse any website** - prices will be automatically converted
-5. **Hover over prices** to see conversions in tooltip
-
-### Changing Settings
-1. Click the **extension icon**
-2. Click **"Settings"** button
-3. Configure:
-   - Default target currency
-   - Display mode (tooltip/inline/replacement)
-   - Visual highlighting
-   - Theme selection
-   - Auto-update interval
-
-### Using Context Menu
-1. **Select any price text** on a webpage
-2. **Right-click** the selection
-3. Choose **"💱 Convert to [your currency]"**
-4. Conversion appears in a popup notification
-
-## ⚙️ Configuration Options
-
-### Appearance Settings
-- **Theme Selection**: Choose from 14 beautiful themes
-- **UI Scale**: Adjust popup size (80% - 150%)
-- **Visual Highlighting**: Toggle price highlighting
-- **Custom Colors**: Themes include gradient, shadow, border customization
-
-### Currency Settings
-- **Default Target Currency**: Your preferred currency for conversions
-- **Default Source Currency**: Optional - auto-detect if not set
-- **Favorite Currencies**: Quick access to frequently used currencies
-
-### Display Settings
-- **Show Inline Conversion**: Display next to original price
-- **Replace Original Price**: Replace with converted price
-- **Show Tooltips**: Native HTML title tooltips (recommended)
-- **Highlight Converted Prices**: Visual feedback for converted prices
-
-### Detection Settings
-- **Auto-Convert on Page Load**: Automatically convert when page loads
-- **Auto-Convert on Hover**: Convert prices when you hover over them
-- **Detect Price Ranges**: Enable range detection ($10-$20)
-- **Skip Shipping Prices**: Ignore shipping/delivery costs
-- **Skip Sale Prices**: Ignore crossed-out/original prices
-
-### Advanced Settings
-- **API Provider**: Choose exchange rate service
-- **Custom API Key**: Use your own API key
-- **Update Interval**: How often to refresh rates (1-168 hours)
-- **Cache Size**: Maximum cached conversions (100-1000)
-- **Debug Mode**: Enable detailed logging
-- **Element Detection Limit**: Max elements per scan (100-1000)
-
-## 🏗️ Architecture
-
-### File Structure
-```
-currency-converter-pro/
-├── manifest.json              # Extension configuration
-├── background.js              # Service worker (API calls, storage)
-├── content.js                 # Main price detection engine
-├── lib/
-│   ├── logger.js             # Professional logging system
-│   ├── regex.js              # All regex patterns
-│   ├── patterns.js           # Detection rules & site selectors
-│   └── themes.js             # Theme configurations
-├── pages/
-│   ├── popup/
-│   │   ├── popup.html        # Extension popup interface
-│   │   └── popup.js          # Popup functionality
-│   └── options/
-│       ├── options.html      # Settings page
-│       ├── options.js        # Settings functionality
-│       └── tabs.js           # Tab navigation
-├── styles/
-│   ├── content.css           # Injected page styles
-│   ├── popup.css             # Popup styles
-│   ├── options.css           # Settings page styles
-│   └── themes.css            # Theme definitions
-└── icons/                    # Extension icons
-```
-
-### Technology Stack
-- **Manifest V3**: Latest Chrome extension architecture
-- **Vanilla JavaScript**: No frameworks - lightweight and fast
-- **CSS3**: Modern styling with gradients and animations
-- **Chrome Storage API**: Settings and rate caching
-- **Service Worker**: Background rate updates
-- **Content Scripts**: Page injection and price detection
-- **Context Menus API**: Right-click conversion
-
-### Detection Algorithm
-1. **Page Scan**: MutationObserver watches for DOM changes
-2. **Element Selection**: Site-specific or generic selectors
-3. **Text Extraction**: Extracts text from potential price elements
-4. **Pattern Matching**: Tests against 30+ regex patterns
-5. **Validation**: Excludes false positives (phone numbers, dates, etc.)
-6. **Context Analysis**: Checks surrounding text for price indicators
-7. **Currency Detection**: Identifies currency from symbols or codes
-8. **Conversion**: Applies exchange rate and formats result
-9. **Display**: Shows in tooltip, inline, or replacement mode
-
-## 🎯 Use Cases
-
-### International Shopping
-- **Compare Prices**: See if US or EU prices are better for your location
-- **Budget Planning**: Know exact costs in your currency before buying
-- **No Surprises**: Avoid unexpected conversion charges from banks
-
-### Travel Planning
-- **Hotel Prices**: Compare accommodation costs across countries
-- **Flight Tickets**: See airfare in your currency
-- **Local Costs**: Understand prices when researching destinations
-
-### Business & Finance
-- **Market Research**: Analyze pricing across international markets
-- **Vendor Comparison**: Compare suppliers from different countries
-- **Cost Analysis**: Evaluate international purchases in your currency
-
-### Cryptocurrency Trading
-- **Crypto Prices**: Convert Bitcoin, Ethereum, and altcoin prices
-- **Portfolio Value**: See holdings in your local currency
-- **Exchange Rates**: Monitor crypto to fiat conversions
-
-## 🤝 Contributing
-
-Contributions are welcome! This project is open source and community-driven.
-
-### How to Contribute
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Test thoroughly
-5. Commit with clear messages (`git commit -m 'Add amazing feature'`)
-6. Push to your branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-### Development Setup
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/currency-converter-pro.git
-
-# Load in Chrome
-1. Go to chrome://extensions/
-2. Enable Developer Mode
-3. Click "Load unpacked"
-4. Select the project directory
-
-# Make changes and reload extension
-# Click reload icon on chrome://extensions/
-```
-
-### Code Guidelines
-- Use ES6+ JavaScript features
-- Follow existing code style
-- Add comments for complex logic
-- Test on multiple websites
-- Ensure no console errors
-- Update README if adding features
-
-## 🐛 Known Issues
-
-### Limitations
-- **Dynamic Prices**: Some single-page apps with highly dynamic content may need manual refresh
-- **Lazy Loading**: Prices loaded after scrolling may not be detected immediately
-- **Custom Fonts**: Some websites use custom fonts that hide text from detection
-- **iFrames**: Prices inside iframes may not be detected (browser security)
-
-### Workarounds
-- **Manual Conversion**: Use context menu on selected text
-- **Reload Extension**: Click reload on chrome://extensions/
-- **Report Issues**: Use GitHub issues to report problematic websites
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Exchange rate data provided by multiple free and paid API services
-- Icons and design inspired by modern material design principles
-- Community feedback and bug reports help improve the extension
-- Built with ❤️ for the global shopping community
-
-## 📞 Support
-
-### Get Help
-- **GitHub Issues**: [Report bugs or request features](https://github.com/KuchiSofts/Currency-Converter-Pro/issues)
-- **Documentation**: Read this README for detailed information
-- **Settings**: Check extension settings for configuration options
-
-### FAQ
-
-**Q: Why aren't prices being converted?**
-A: Check that: (1) Currency is set in popup, (2) Exchange rates are loaded, (3) Page has detectable prices. Try manual conversion via context menu.
-
-**Q: Can I use my own exchange rate API?**
-A: Yes! Go to Settings → Advanced → API Provider and enter your API key.
-
-**Q: Does this work offline?**
-A: Yes, with cached exchange rates. Rates are stored locally for 24 hours.
-
-**Q: Is my data being collected?**
-A: No. All processing happens locally in your browser. No data is transmitted to any servers except exchange rate APIs.
-
-**Q: Why do some prices show wrong currency?**
-A: Dollar signs ($) are ambiguous (USD, CAD, AUD, etc.). Use context menu conversion or site-specific detection will improve accuracy.
-
-**Q: Can I convert cryptocurrency?**
-A: Yes! The extension detects BTC, ETH, USDT and other major cryptocurrencies.
-
-**Q: How often are exchange rates updated?**
-A: Default is 24 hours. You can change this in Settings → Advanced → Update Interval.
-
-**Q: Does this work on all websites?**
-A: It works on most websites. Some heavily customized sites or those using canvas/SVG for prices may not work.
+Currency Converter Pro is a lightweight Chrome extension that finds prices on any web page, such as `$49.99`, `€12,50` or `US $10-11.90`, and converts them to the currency you choose. Hover a price to see the converted amount, or have the extension replace prices in place. It needs no account, has no tracking and no frameworks, and runs on plain JavaScript and Manifest V3.
 
 ---
 
-**Made with ❤️ for international shoppers worldwide**
+## Features
 
-*Currency Converter Pro - v3.2.2*
+### Automatic price detection
+- Scans pages for prices and watches for new content as you scroll or as single-page apps update.
+- Understands many formats:
+  - Symbols: `$49.99`, `€12,50`, `£100`, `₪120`, `¥1,000`
+  - Prefixed dollars: `US$10`, `C$50`, `A$75`, `NZ$100`, `HK$20`
+  - Currency codes: `USD 49.99`, `100 GBP`
+  - Symbols after the amount: `12,99 zł`, `100 Kč`, `1 500 Ft`, `45 lei`
+  - Ranges: `$10-$20`, `US $10 - 11.90`
+  - Abbreviations: `$5k`, `€2.5M`, `£1.2B`
+  - Unit prices and qualifiers: `$5 each`, `from $20`, `approximately €100`
+  - Cryptocurrencies: `0.001 BTC`, `1.5 ETH`, `100 USDT`
+- Handles **fragmented prices** split across several HTML elements, as on Amazon, AliExpress and Newegg.
+- Filters out common false positives such as phone numbers.
+- Includes tuned selectors for 25+ shopping sites (Amazon, eBay, AliExpress, Walmart, Etsy, Booking.com, Shopify/WooCommerce/Magento stores and more), with generic detection everywhere else.
+
+### Display options
+| Mode | What it does | Default |
+| --- | --- | --- |
+| **Tooltip** | Adds the converted amount to the price's native browser tooltip. Fully compatible with page layouts. | On |
+| **Replace prices** | Replaces the price text with the converted amount. The original stays in the tooltip. | Off |
+| **Highlight** | Visually marks detected prices. | Off |
+
+You can also set the number of decimal places (or smart rounding), symbol or code display, thousands separators and a minimum price threshold.
+
+### Right-click conversion
+- Right-click a detected price and choose **Convert to [your currency]** to convert it in place.
+- Or select any price text, right-click, and convert the selection.
+
+### Popup converter
+- Quick manual converter with a swap button. It covers about 55 popular fiat currencies and 12 cryptocurrencies.
+- Optional sections you can enable in settings:
+  - Favorite currencies
+  - Refresh, copy, history and rate comparison buttons
+  - A stats bar
+  - Quick toggles for tooltip, highlight and replace mode
+
+### Exchange rates
+- Rates come from **ExchangeRate-API** by default, with no API key needed. You can switch to another provider in the settings (see below).
+- Cryptocurrency prices come from **CoinGecko**: BTC, ETH, USDT, USDC, BNB, XRP, ADA, SOL, DOGE, DOT, MATIC, LTC, BCH, LINK, XLM and ATOM.
+- Rates are cached locally and refreshed in the background on your chosen interval (1 hour to 2 days, daily by default). Cached rates are used when you are offline or a provider is unavailable.
+
+### Personalization
+- 14 themes for the popup and settings page, with Chrome Dark as the default.
+- UI scale from 70% to 150%.
+- Accessibility options: high contrast, large text and reduced motion.
+- Import and export your settings as JSON. When you export, the extension asks before including your API key.
+- Debug mode for detailed console logging when troubleshooting.
+
+---
+
+## Installation
+
+### Chrome Web Store
+Coming soon.
+
+### Install from source
+1. Download this repository as a ZIP and extract it, or clone it:
+   ```bash
+   git clone https://github.com/KuchiSofts/Currency-Converter-Pro.git
+   ```
+2. Open `chrome://extensions` in Chrome or any Chromium-based browser.
+3. Turn on **Developer mode** (top-right toggle).
+4. Click **Load unpacked** and select the `Currency-Converter-Pro` folder (the one that contains `manifest.json`).
+5. Pin the extension from the puzzle-piece menu so it is easy to reach.
+
+To update, pull the latest changes (or extract the new ZIP) and click the reload icon on the extension's card in `chrome://extensions`.
+
+## Getting started
+1. Click the extension icon and open **Settings** (gear icon).
+2. Under **Currency**, choose your **Default Currency**. On first install it is set from your browser's language and region.
+3. Browse any shopping site and hover a price to see it in your currency.
+4. Optionally turn on **Replace Original Prices** or **Highlight Detected Prices** under **Popup Layout**.
+
+---
+
+## Exchange rate providers
+
+Choose a provider under **Settings > Currency > Exchange Rate API**.
+
+| Provider | API key | Free plan | Coverage | Notes |
+| --- | --- | --- | --- | --- |
+| [ExchangeRate-API](https://www.exchangerate-api.com) (default) | Not required | Yes, open access | 160+ currencies | Updated daily. Attribution is shown in the popup. |
+| [Frankfurter](https://frankfurter.dev) (European Central Bank data) | Not required | Yes | ~30 currencies | Official ECB reference rates, updated on working days. |
+| [Bank of Israel](https://www.boi.org.il) | Not required | Yes | ~14 currencies | Official representative rates against ILS. |
+| [Open Exchange Rates](https://openexchangerates.org) | Required | Yes, limited requests | 170+ currencies | |
+| [CurrencyAPI](https://currencyapi.com) | Required | Yes, limited requests | 150+ currencies | |
+| [Fixer.io](https://fixer.io) | Required | Yes, limited requests | 170+ currencies | Free plan uses EUR base. Rebased to USD automatically. |
+| [CurrencyLayer](https://currencylayer.com) | Required | Yes, limited requests | 160+ currencies | |
+
+All rates are normalized to a USD base internally. If a provider that needs a key has none, the extension falls back to ExchangeRate-API. If a request fails, the last cached rates are used.
+
+> Rates are for reference only and may differ from the rates your bank or card issuer charges.
+
+---
+
+## How it works
+
+```
+ ┌───────────────────┐   getExchangeRates   ┌───────────────────────────┐   HTTPS   ┌──────────────────────┐
+ │ content.js        │ ───────────────────▶ │ background.js             │ ────────▶ │ Selected provider    │
+ │ (every web page)  │ ◀─────────────────── │ (service worker)          │ ◀──────── │ + CoinGecko (crypto) │
+ │ find + convert    │        rates         │ fetch, normalize to USD,  │           └──────────────────────┘
+ └───────────────────┘                      │ cache, alarms refresh     │
+                                            └─────────────┬─────────────┘
+                                                          │ chrome.storage.local
+                                                          ▼
+                                                 cached rates + timestamp
+```
+
+1. **Background service worker** (`background.js`) fetches rates from the selected provider and CoinGecko. It rebases them to USD, stores them in `chrome.storage.local`, and schedules refreshes with `chrome.alarms`.
+2. **Content script** (`content.js` plus `lib/`) scans the page using site-specific selectors and generic regex patterns. It identifies each currency from its symbol, code or the site's domain, then converts the price locally.
+3. **Results** are shown as native tooltips or as in-place replacements. A `MutationObserver` picks up prices that load later.
+
+## Privacy
+
+Currency Converter Pro collects **no** personal data and has no analytics.
+
+- Settings are stored in `chrome.storage.sync`. Cached rates and popup history are stored in `chrome.storage.local`.
+- Network requests go **only** to your selected rate provider and to CoinGecko, and contain no information about you or the pages you visit.
+- Page text is read **locally** to find prices and is never sent anywhere.
+
+See [PRIVACY.md](PRIVACY.md) for details.
+
+### Permissions
+| Permission | Why |
+| --- | --- |
+| `storage` | Save settings and cached rates |
+| `contextMenus` | Right-click "Convert to ..." menu |
+| `alarms` | Background rate refresh on your schedule |
+| Host access to rate provider and CoinGecko domains | Fetch exchange rates |
+| Content script on all sites | Detect prices on the pages you visit |
+
+---
+
+## Project structure
+
+```
+Currency-Converter-Pro/
+├── manifest.json          # Extension manifest (MV3)
+├── background.js          # Service worker: rate providers, caching, alarms, context menu
+├── content.js             # Price detection and conversion engine
+├── lib/
+│   ├── logger.js          # Debug logging (silent unless debug mode is on)
+│   ├── regex.js           # Shared price and currency regex patterns
+│   ├── patterns.js        # Currency maps, site selectors, detection rules
+│   └── themes.js          # Theme manager
+├── pages/
+│   ├── popup/             # Toolbar popup (popup.html, popup.js)
+│   └── options/           # Settings page (options.html, options.js, tabs.js)
+├── styles/                # content.css, popup.css, options.css, themes.css
+├── icons/                 # Extension icons (16, 32, 48, 128)
+├── PRIVACY.md
+└── LICENSE
+```
+
+The extension has no build step. The files in the repository are exactly what Chrome loads.
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository and create a branch: `git checkout -b feature/my-change`.
+2. Load the folder as an unpacked extension (see [Install from source](#install-from-source)).
+3. Make your changes and reload the extension in `chrome://extensions` to test them. Test on a few real shopping sites, and turn on **Debug Mode** in settings to see detection logs in the console.
+4. Check syntax with `node --check <file>.js` for any JavaScript file you changed.
+5. Open a pull request that describes the change and the sites you tested.
+
+Please follow the existing code style: plain ES2020+ JavaScript with no frameworks. Report bugs or problem sites in [Issues](https://github.com/KuchiSofts/Currency-Converter-Pro/issues).
+
+### Known limitations
+- `$` is ambiguous (USD, CAD, AUD, MXN...). The extension uses prefixes such as `C$` and the site's domain to decide, and otherwise assumes USD.
+- Prices drawn on canvas, in images, or inside cross-origin iframes cannot be detected.
+- Some heavily scripted sites may re-render prices after they have been replaced.
+
+## Credits and data sources
+
+- **[Rates By Exchange Rate API](https://www.exchangerate-api.com)**: the default exchange rate provider.
+- **[Crypto prices powered by CoinGecko](https://www.coingecko.com)**
+- Optional providers: [Frankfurter](https://frankfurter.dev) (European Central Bank data), [Bank of Israel](https://www.boi.org.il), [Open Exchange Rates](https://openexchangerates.org), [CurrencyAPI](https://currencyapi.com), [Fixer.io](https://fixer.io) and [CurrencyLayer](https://currencylayer.com).
+
+## License
+
+Released under the [MIT License](LICENSE). © 2026 KuchiSofts.
