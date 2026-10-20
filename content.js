@@ -1134,8 +1134,64 @@ function detectCurrency(text, element = null) {
     if (codeMatch[0].includes('US $') || codeMatch[0].includes('US$')) return 'USD';
   }
 
-  // Method 3: Check for currency names in text
   const lowerText = text.toLowerCase();
+
+  // Method 3: Check for currency symbols (order matters - check multi-char first)
+  if (text.includes('US $') || text.includes('US$')) return 'USD';
+  if (text.includes('AU $') || text.includes('AU$')) return 'AUD';
+  if (text.includes('C$') || text.includes('CAD$')) return 'CAD';
+  if (text.includes('A$')) return 'AUD';
+  if (text.includes('NZ$') || text.includes('NZ $')) return 'NZD';
+  if (text.includes('HK$') || text.includes('HK $')) return 'HKD';
+  if (text.includes('S$') || text.includes('SG$')) return 'SGD';
+  if (text.includes('R$')) return 'BRL';
+  if (text.includes('NT$') || text.includes('TW$')) return 'TWD';
+  if (text.includes('MX$')) return 'MXN';
+  if (text.includes('د.إ') || text.includes('AED')) return 'AED';
+  if (text.includes('د.ك') || text.includes('KWD')) return 'KWD';
+  if (text.includes('₣') || text.includes('CHF')) return 'CHF';
+  if (text.includes('€')) return 'EUR';
+  if (text.includes('£')) return 'GBP';
+  if (text.includes('₹')) return 'INR';
+  if (text.includes('₪')) return 'ILS';
+  if (text.includes('₽')) return 'RUB';
+  if (text.includes('₩')) return 'KRW';
+  if (text.includes('฿')) return 'THB';
+  if (text.includes('₺')) return 'TRY';
+  if (text.includes('zł')) return 'PLN';
+  if (text.includes('Kč')) return 'CZK';
+  // Letter symbols must sit next to the amount ("100 Ft", "45 lei") so words
+  // such as "Ft. Lauderdale", "sleigh" or "Ukraine" are not read as currencies
+  if (/\d\s*Ft\b|\bFt\s*\d/.test(text)) return 'HUF';
+  if (/\d\s*lei\b/.test(text)) return 'RON';
+  if (text.includes('﷼')) return 'SAR';
+  if (text.includes('₱')) return 'PHP';
+  if (text.includes('₫')) return 'VND';
+  if (text.includes('₴')) return 'UAH';
+  if (text.includes('¥')) {
+    // Context-aware: check if it's Chinese Yuan or Japanese Yen
+    if (lowerText.includes('yuan') || lowerText.includes('cny') || lowerText.includes('china')) return 'CNY';
+    return 'JPY'; // Default to JPY
+  }
+  if (/\d\s*kr\b|\bkr\.?\s*\d/.test(text)) {
+    // Context-aware: check which Nordic currency
+    if (lowerText.includes('denmark') || lowerText.includes('dkk')) return 'DKK';
+    if (lowerText.includes('norway') || lowerText.includes('nok')) return 'NOK';
+    if (lowerText.includes('iceland') || lowerText.includes('isk')) return 'ISK';
+    return 'SEK'; // Default to Swedish Krona
+  }
+  if (text.includes('$')) {
+    // Use page currency if it's a dollar-based currency
+    if (pageCurrency && ['USD', 'CAD', 'AUD', 'NZD', 'HKD', 'SGD', 'TWD', 'MXN'].includes(pageCurrency)) {
+      log(`💰 Using page currency for $: ${pageCurrency}`);
+      return pageCurrency;
+    }
+    return 'USD'; // Default to USD
+  }
+
+  // Method 4: Check for currency names in text ("25 euros")
+  // Runs after the symbols so words like "Brand" or "San Francisco" next to a
+  // "$" price cannot override it, and only matches whole words
   const currencyNames = {
     'dollar': 'USD',
     'dollars': 'USD',
@@ -1166,61 +1222,10 @@ function detectCurrency(text, element = null) {
   };
 
   for (const [name, code] of Object.entries(currencyNames)) {
-    if (lowerText.includes(name)) {
+    if (new RegExp(`\\b${name}\\b`).test(lowerText)) {
       log(`💬 Detected currency from name: ${name} → ${code}`);
       return code;
     }
-  }
-
-  // Method 4: Check for currency symbols (order matters - check multi-char first)
-  if (text.includes('US $') || text.includes('US$')) return 'USD';
-  if (text.includes('AU $') || text.includes('AU$')) return 'AUD';
-  if (text.includes('C$') || text.includes('CAD$')) return 'CAD';
-  if (text.includes('A$')) return 'AUD';
-  if (text.includes('NZ$') || text.includes('NZ $')) return 'NZD';
-  if (text.includes('HK$') || text.includes('HK $')) return 'HKD';
-  if (text.includes('S$') || text.includes('SG$')) return 'SGD';
-  if (text.includes('R$')) return 'BRL';
-  if (text.includes('NT$') || text.includes('TW$')) return 'TWD';
-  if (text.includes('MX$')) return 'MXN';
-  if (text.includes('د.إ') || text.includes('AED')) return 'AED';
-  if (text.includes('د.ك') || text.includes('KWD')) return 'KWD';
-  if (text.includes('₣') || text.includes('CHF')) return 'CHF';
-  if (text.includes('€')) return 'EUR';
-  if (text.includes('£')) return 'GBP';
-  if (text.includes('₹')) return 'INR';
-  if (text.includes('₪')) return 'ILS';
-  if (text.includes('₽')) return 'RUB';
-  if (text.includes('₩')) return 'KRW';
-  if (text.includes('฿')) return 'THB';
-  if (text.includes('₺')) return 'TRY';
-  if (text.includes('zł')) return 'PLN';
-  if (text.includes('Kč')) return 'CZK';
-  if (text.includes('Ft')) return 'HUF';
-  if (text.includes('lei')) return 'RON';
-  if (text.includes('﷼')) return 'SAR';
-  if (text.includes('₱')) return 'PHP';
-  if (text.includes('₫')) return 'VND';
-  if (text.includes('₴')) return 'UAH';
-  if (text.includes('¥')) {
-    // Context-aware: check if it's Chinese Yuan or Japanese Yen
-    if (lowerText.includes('yuan') || lowerText.includes('cny') || lowerText.includes('china')) return 'CNY';
-    return 'JPY'; // Default to JPY
-  }
-  if (text.includes('kr')) {
-    // Context-aware: check which Nordic currency
-    if (lowerText.includes('denmark') || lowerText.includes('dkk')) return 'DKK';
-    if (lowerText.includes('norway') || lowerText.includes('nok')) return 'NOK';
-    if (lowerText.includes('iceland') || lowerText.includes('isk')) return 'ISK';
-    return 'SEK'; // Default to Swedish Krona
-  }
-  if (text.includes('$')) {
-    // Use page currency if it's a dollar-based currency
-    if (pageCurrency && ['USD', 'CAD', 'AUD', 'NZD', 'HKD', 'SGD', 'TWD', 'MXN'].includes(pageCurrency)) {
-      log(`💰 Using page currency for $: ${pageCurrency}`);
-      return pageCurrency;
-    }
-    return 'USD'; // Default to USD
   }
 
   // Method 5: Fallback to page currency if detected
