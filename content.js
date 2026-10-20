@@ -2039,7 +2039,7 @@ function extractAmount(text, currency, element = null) {
     // Currency code: 123.45 USD, USD 123.45
     /(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?/i,
     // Arabic/special symbols
-    /[د\.إ﷼]\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
+    /(?:د\.إ|﷼)\s*(\d{1,3}(?:[,.\s]\d{3})*(?:[.,]\d{1,2})?)/,
     // Fragmented price pattern (for AliExpress): "US $" followed by digits split across elements
     /US\s*\$?\s*(\d+)\s*\.?\s*(\d+)/i,
     // Just currency symbol followed by fragmented numbers
@@ -3853,7 +3853,7 @@ function convertPrices() {
           const text = node.textContent.trim();
 
           // Use imported regex pattern if available, otherwise fallback to inline
-          const hasCurrencyPattern = HAS_CURRENCY_REGEX || /[$€£¥₹₪₽₩฿₺₣₱₫₴złKčFtlei]|\b(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b/i;
+          const hasCurrencyPattern = HAS_CURRENCY_REGEX || /[$€£¥₹₪₽₩฿₺₣₱₫₴]|zł|Kč|(?<![A-Za-z])(?:Ft|lei)(?![A-Za-z])|\b(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)\b/i;
 
           // Accept if text has currency symbol/code AND contains digits
           if (hasCurrencyPattern.test(text) && /\d/.test(text)) {
