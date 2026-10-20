@@ -329,11 +329,24 @@ function analyzeFragmentedPriceStyles(element) {
   return result;
 }
 
-// ⭐ SUPER SMART: Generate fragmented HTML with preserved styles
-function generateStyledConvertedHTML(convertedText, styleAnalysis) {
+// ⭐ SUPER SMART: Build fragmented price nodes with preserved styles
+// Elements are created with the DOM API and styled through element.style, so
+// computed values (e.g. font-family lists containing quotes) cannot break out
+// of a style attribute and page text is never parsed as HTML.
+function buildStyledConvertedFragment(convertedText, styleAnalysis) {
+  const fragment = document.createDocumentFragment();
+
+  const appendStyledSpan = (text, styles) => {
+    const span = document.createElement('span');
+    applyPreservedStyles(span, styles);
+    span.textContent = text;
+    fragment.appendChild(span);
+  };
+
   if (!styleAnalysis.hasFragments) {
-    // Simple price - return single span
-    return `<span style="color: ${styleAnalysis.numberStyle.color}; font-size: ${styleAnalysis.numberStyle.fontSize}; font-weight: ${styleAnalysis.numberStyle.fontWeight}; font-family: ${styleAnalysis.numberStyle.fontFamily}; line-height: ${styleAnalysis.numberStyle.lineHeight}; letter-spacing: ${styleAnalysis.numberStyle.letterSpacing}; text-decoration: ${styleAnalysis.numberStyle.textDecoration}; text-transform: ${styleAnalysis.numberStyle.textTransform};">${convertedText}</span>`;
+    // Simple price - single span
+    appendStyledSpan(convertedText, styleAnalysis.numberStyle);
+    return fragment;
   }
 
   // Parse converted text to extract parts
@@ -362,34 +375,32 @@ function generateStyledConvertedHTML(convertedText, styleAnalysis) {
     parts.number = numberMatch[0];
   }
 
-  log(`🎨 Generating styled HTML: "${parts.countryCode}" "${parts.symbol}" "${parts.number}"`);
-
-  // Build HTML with separate spans for each part
-  let html = '';
+  log(`🎨 Generating styled nodes: "${parts.countryCode}" "${parts.symbol}" "${parts.number}"`);
 
   // Add country code with its style
   if (parts.countryCode) {
-    html += `<span style="color: ${styleAnalysis.countryCodeStyle.color}; font-size: ${styleAnalysis.countryCodeStyle.fontSize}; font-weight: ${styleAnalysis.countryCodeStyle.fontWeight}; font-family: ${styleAnalysis.countryCodeStyle.fontFamily}; line-height: ${styleAnalysis.countryCodeStyle.lineHeight}; letter-spacing: ${styleAnalysis.countryCodeStyle.letterSpacing}; text-decoration: ${styleAnalysis.countryCodeStyle.textDecoration}; text-transform: ${styleAnalysis.countryCodeStyle.textTransform};">${parts.countryCode}</span>&nbsp;`;
+    appendStyledSpan(parts.countryCode, styleAnalysis.countryCodeStyle);
+    fragment.appendChild(document.createTextNode(' '));
   }
 
   // Add symbol with its style
   if (parts.symbol) {
-    html += `<span style="color: ${styleAnalysis.symbolStyle.color}; font-size: ${styleAnalysis.symbolStyle.fontSize}; font-weight: ${styleAnalysis.symbolStyle.fontWeight}; font-family: ${styleAnalysis.symbolStyle.fontFamily}; line-height: ${styleAnalysis.symbolStyle.lineHeight}; letter-spacing: ${styleAnalysis.symbolStyle.letterSpacing}; text-decoration: ${styleAnalysis.symbolStyle.textDecoration}; text-transform: ${styleAnalysis.symbolStyle.textTransform};">${parts.symbol}</span>`;
+    appendStyledSpan(parts.symbol, styleAnalysis.symbolStyle);
   }
 
   // ⭐ INSERT SPACE: If original had a space element between currency and numbers, recreate it
   if (styleAnalysis.hasSpaceBetweenCurrencyAndNumber && parts.number) {
     // Use a simple non-breaking space for reliable spacing
-    html += '&nbsp;';
-    log(`🔲 Inserted SPACE (&nbsp;) between currency and number`);
+    fragment.appendChild(document.createTextNode(' '));
+    log(`🔲 Inserted SPACE (non-breaking) between currency and number`);
   }
 
   // Add number with its style
   if (parts.number) {
-    html += `<span style="color: ${styleAnalysis.numberStyle.color}; font-size: ${styleAnalysis.numberStyle.fontSize}; font-weight: ${styleAnalysis.numberStyle.fontWeight}; font-family: ${styleAnalysis.numberStyle.fontFamily}; line-height: ${styleAnalysis.numberStyle.lineHeight}; letter-spacing: ${styleAnalysis.numberStyle.letterSpacing}; text-decoration: ${styleAnalysis.numberStyle.textDecoration}; text-transform: ${styleAnalysis.numberStyle.textTransform};">${parts.number}</span>`;
+    appendStyledSpan(parts.number, styleAnalysis.numberStyle);
   }
 
-  return html;
+  return fragment;
 }
 
 // Helper to apply preserved styles to an element
@@ -4744,11 +4755,11 @@ function convertClickedPrice() {
     // ⭐ SUPER SMART: Analyze fragmented price structure and extract styles for each part
     const styleAnalysis = analyzeFragmentedPriceStyles(element);
 
-    // ⭐ Generate styled HTML with separate spans for country code, symbol, and number
-    const styledHTML = generateStyledConvertedHTML(convertedText, styleAnalysis);
+    // ⭐ Build styled nodes with separate spans for country code, symbol, and number
+    const styledFragment = buildStyledConvertedFragment(convertedText, styleAnalysis);
 
-    // Replace entire innerHTML with styled HTML
-    element.innerHTML = styledHTML;
+    // Replace the element's contents with the styled nodes
+    element.replaceChildren(styledFragment);
     const normalizedOrigPrice = (originalPrice || '').replace(/\s+/g, ' ').trim();
     element.title = `Original: ${normalizedOrigPrice} (${sourceCurrency})`;
 
@@ -4824,7 +4835,12 @@ function convertClickedPrice() {
         // ⭐ PRESERVE ORIGINAL STYLES - capture before replacement
         const originalStyles = getPreservedStyles(element);
 
-        element.innerHTML = `<span style="color: inherit; font-size: inherit; font-weight: inherit;">${convertedText}</span>`;
+        const replacementSpan = document.createElement('span');
+        replacementSpan.style.color = 'inherit';
+        replacementSpan.style.fontSize = 'inherit';
+        replacementSpan.style.fontWeight = 'inherit';
+        replacementSpan.textContent = convertedText;
+        element.replaceChildren(replacementSpan);
 
         // ⭐ APPLY PRESERVED STYLES - keeps same appearance as original
         const newSpan = element.querySelector('span');
