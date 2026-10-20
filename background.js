@@ -115,14 +115,54 @@ const DEFAULT_SETTINGS = {
   debugMode: false                  // Debug mode OFF by default
 };
 
+// Currency used in each region (ISO 3166 code) - for picking a sensible
+// default target currency on first install
+const REGION_CURRENCIES = {
+  US: 'USD', PR: 'USD', EC: 'USD', SV: 'USD', PA: 'USD',
+  GB: 'GBP', JP: 'JPY', IL: 'ILS', CA: 'CAD', AU: 'AUD', NZ: 'NZD',
+  CH: 'CHF', LI: 'CHF', CN: 'CNY', IN: 'INR', KR: 'KRW', HK: 'HKD',
+  SG: 'SGD', TH: 'THB', MY: 'MYR', ID: 'IDR', PH: 'PHP', VN: 'VND',
+  TW: 'TWD', PK: 'PKR', BD: 'BDT', BR: 'BRL', MX: 'MXN', AR: 'ARS',
+  CL: 'CLP', CO: 'COP', PE: 'PEN', UY: 'UYU', CZ: 'CZK', DK: 'DKK',
+  HU: 'HUF', NO: 'NOK', PL: 'PLN', RU: 'RUB', SE: 'SEK', TR: 'TRY',
+  UA: 'UAH', RO: 'RON', IS: 'ISK', AL: 'ALL', AE: 'AED', SA: 'SAR',
+  QA: 'QAR', KW: 'KWD', BH: 'BHD', OM: 'OMR', JO: 'JOD', ZA: 'ZAR',
+  EG: 'EGP', NG: 'NGN', KE: 'KES', GH: 'GHS', MA: 'MAD',
+  // Euro area
+  AT: 'EUR', BE: 'EUR', BG: 'EUR', CY: 'EUR', DE: 'EUR', EE: 'EUR',
+  ES: 'EUR', FI: 'EUR', FR: 'EUR', GR: 'EUR', HR: 'EUR', IE: 'EUR',
+  IT: 'EUR', LT: 'EUR', LU: 'EUR', LV: 'EUR', MT: 'EUR', NL: 'EUR',
+  PT: 'EUR', SI: 'EUR', SK: 'EUR', MC: 'EUR', SM: 'EUR', VA: 'EUR',
+  AD: 'EUR', ME: 'EUR', XK: 'EUR'
+};
+
+// Guess the user's currency from the browser language (e.g. "de-DE" -> EUR)
+function getCurrencyFromLocale() {
+  try {
+    const language = (navigator.languages && navigator.languages[0]) || navigator.language;
+    if (!language) return 'USD';
+    // maximize() fills in the likely region for language-only tags ("ja" -> "ja-Jpan-JP")
+    const region = new Intl.Locale(language).maximize().region;
+    return REGION_CURRENCIES[region] || 'USD';
+  } catch (error) {
+    return 'USD';
+  }
+}
+
 // Initialize extension
 chrome.runtime.onInstalled.addListener(async (details) => {
   // Only fill in settings that are missing - never overwrite the user's
   // choices when the extension is updated or reloaded
   try {
-    const existing = await chrome.storage.sync.get(Object.keys(DEFAULT_SETTINGS));
+    const defaults = { ...DEFAULT_SETTINGS };
+    if (details.reason === 'install') {
+      // New installs start with the currency of the browser's locale
+      defaults.defaultTargetCurrency = getCurrencyFromLocale();
+    }
+
+    const existing = await chrome.storage.sync.get(Object.keys(defaults));
     const missing = {};
-    for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+    for (const [key, value] of Object.entries(defaults)) {
       if (existing[key] === undefined) {
         missing[key] = value;
       }
