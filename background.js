@@ -72,6 +72,14 @@ async function getUpdateIntervalMinutes() {
 // Schedule periodic background refreshes that honor the user's interval
 async function scheduleRateRefresh() {
   const periodInMinutes = await getUpdateIntervalMinutes();
+
+  // Keep an existing alarm with the same period, so restarting the browser
+  // does not push the next refresh back by a full interval every time
+  const existing = await chrome.alarms.get(RATE_REFRESH_ALARM);
+  if (existing && existing.periodInMinutes === periodInMinutes) {
+    return;
+  }
+
   await chrome.alarms.create(RATE_REFRESH_ALARM, {
     delayInMinutes: periodInMinutes,
     periodInMinutes
