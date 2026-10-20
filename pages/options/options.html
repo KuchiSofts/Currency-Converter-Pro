@@ -359,15 +359,16 @@
                 <p class="setting-hint">Choose your data source for exchange rates</p>
               </div>
               <select id="apiProvider" class="select-input">
-                <optgroup label="Free APIs">
-                  <option value="exchangerate-api">ExchangeRate-API (Free - 1500/month)</option>
-                  <option value="currencyapi">CurrencyAPI (Free - 300/month)</option>
-                  <option value="bank-of-israel">Bank of Israel (Free)</option>
-                  <option value="ecb">European Central Bank (Free)</option>
+                <optgroup label="No API key needed">
+                  <option value="exchangerate-api">ExchangeRate-API (default, 160+ currencies, daily)</option>
+                  <option value="ecb">European Central Bank via Frankfurter (~30 currencies, daily)</option>
+                  <option value="bank-of-israel">Bank of Israel (~14 currencies, daily)</option>
                 </optgroup>
-                <optgroup label="Premium APIs">
-                  <option value="fixer">Fixer.io (API Key Required)</option>
-                  <option value="currencylayer">CurrencyLayer (API Key Required)</option>
+                <optgroup label="API key required (free plans available)">
+                  <option value="openexchangerates">Open Exchange Rates</option>
+                  <option value="currencyapi">CurrencyAPI</option>
+                  <option value="fixer">Fixer.io</option>
+                  <option value="currencylayer">CurrencyLayer</option>
                 </optgroup>
               </select>
             </div>

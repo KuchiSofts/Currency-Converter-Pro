@@ -74,6 +74,13 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     logError('Failed to apply default settings:', error);
   }
 
+  // Users whose provider was removed in this version fall back to the default
+  try {
+    await migrateRemovedProvider();
+  } catch (error) {
+    logError('Failed to migrate API provider:', error);
+  }
+
   updateExchangeRates();
 
   // Create context menu for currency conversion
@@ -463,47 +470,177 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 
 // API Provider Information
+// Every provider returns a map of "units of currency per 1 USD".
+// Providers that use a different base (EUR, ILS) are rebased to USD.
+const DEFAULT_PROVIDER = 'exchangerate-api';
+
+// Providers that existed in older versions but no longer work
+// (dead endpoints or unsupported authentication). Users who had one of
+// these selected are migrated to the default provider.
+const REMOVED_PROVIDERS = ['exchangerates-api', 'xe'];
+
 const API_PROVIDERS = {
   'exchangerate-api': {
     name: 'ExchangeRate-API',
-    free: true,
     requiresKey: false,
-    url: 'https://api.exchangerate-api.com/v4/latest/USD'
-  },
-  'exchangerates-api': {
-    name: 'ExchangeRates API',
-    free: true,
-    requiresKey: false,
-    url: 'https://api.exchangerates.host/latest?base=USD'
+    buildUrl: () => 'https://open.er-api.com/v6/latest/USD',
+    parse: (data) => {
+      if (data.result !== 'success') {
+        throw new Error(`ExchangeRate-API error: ${data['error-type'] || 'unknown error'}`);
+      }
+      return data.rates;
+    }
   },
   'ecb': {
-    name: 'European Central Bank',
-    free: true,
+    name: 'European Central Bank (via Frankfurter)',
     requiresKey: false,
-    url: 'https://api.exchangerate.host/latest?base=USD&source=ecb'
+    buildUrl: () => 'https://api.frankfurter.dev/v1/latest?base=USD',
+    parse: (data) => {
+      if (!data.rates) {
+        throw new Error('Frankfurter API returned no rates');
+      }
+      // The base currency is not included in the rates object
+      return { ...data.rates, [data.base || 'USD']: 1 };
+    }
+  },
+  'bank-of-israel': {
+    name: 'Bank of Israel',
+    requiresKey: false,
+    buildUrl: () => 'https://boi.org.il/PublicApi/GetExchangeRates',
+    parse: (data) => {
+      if (!Array.isArray(data.exchangeRates) || data.exchangeRates.length === 0) {
+        throw new Error('Bank of Israel API returned no rates');
+      }
+      // Each entry is "ILS per <unit> of <key>"; convert to "<key> per 1 ILS"
+      const rates = { ILS: 1 };
+      data.exchangeRates.forEach(entry => {
+        const ilsPerUnit = Number(entry.currentExchangeRate);
+        const unit = Number(entry.unit) || 1;
+        if (entry.key && ilsPerUnit > 0) {
+          rates[entry.key] = unit / ilsPerUnit;
+        }
+      });
+      return rates;
+    }
+  },
+  'currencyapi': {
+    name: 'CurrencyAPI',
+    requiresKey: true,
+    signupUrl: 'https://app.currencyapi.com/register',
+    guide: 'Free plan available with limited requests. Sign up at currencyapi.com and copy your API key.',
+    buildUrl: (apiKey) => `https://api.currencyapi.com/v3/latest?apikey=${encodeURIComponent(apiKey)}&base_currency=USD`,
+    parse: (data) => {
+      if (!data.data) {
+        throw new Error(`CurrencyAPI error: ${data.message || 'no data returned'}`);
+      }
+      // Values are objects: { code: 'EUR', value: 0.92 }
+      const rates = {};
+      Object.entries(data.data).forEach(([code, entry]) => {
+        rates[code] = entry && entry.value;
+      });
+      return rates;
+    }
   },
   'fixer': {
     name: 'Fixer.io',
-    free: false,
     requiresKey: true,
-    signupUrl: 'https://fixer.io/product',
-    guide: 'Sign up at fixer.io, get your API key from dashboard'
+    signupUrl: 'https://fixer.io/signup/free',
+    guide: 'Free plan available with limited requests (EUR base, rebased to USD automatically). Sign up at fixer.io and copy your access key.',
+    buildUrl: (apiKey) => `https://data.fixer.io/api/latest?access_key=${encodeURIComponent(apiKey)}`,
+    parse: (data) => {
+      if (!data.success) {
+        throw new Error(`Fixer.io error: ${data.error?.info || data.error?.type || 'unknown error'}`);
+      }
+      return { ...data.rates, [data.base || 'EUR']: 1 };
+    }
   },
   'currencylayer': {
     name: 'CurrencyLayer',
-    free: false,
     requiresKey: true,
-    signupUrl: 'https://currencylayer.com/product',
-    guide: 'Sign up at currencylayer.com, get your access key from dashboard'
+    signupUrl: 'https://currencylayer.com/signup/free',
+    guide: 'Free plan available with limited requests. Sign up at currencylayer.com and copy your access key.',
+    buildUrl: (apiKey) => `https://api.currencylayer.com/live?access_key=${encodeURIComponent(apiKey)}`,
+    parse: (data) => {
+      if (!data.success) {
+        throw new Error(`CurrencyLayer error: ${data.error?.info || data.error?.type || 'unknown error'}`);
+      }
+      // Quotes are keyed as <source><target>, e.g. USDEUR
+      const source = data.source || 'USD';
+      const rates = { [source]: 1 };
+      Object.entries(data.quotes || {}).forEach(([pair, value]) => {
+        if (pair.startsWith(source)) {
+          rates[pair.substring(source.length)] = value;
+        }
+      });
+      return rates;
+    }
   },
   'openexchangerates': {
     name: 'Open Exchange Rates',
-    free: 'limited',
     requiresKey: true,
     signupUrl: 'https://openexchangerates.org/signup/free',
-    guide: 'Free tier: 1000 requests/month. Sign up at openexchangerates.org'
+    guide: 'Free plan available with limited requests (1,000/month). Sign up at openexchangerates.org and copy your App ID.',
+    buildUrl: (apiKey) => `https://openexchangerates.org/api/latest.json?app_id=${encodeURIComponent(apiKey)}`,
+    parse: (data) => {
+      if (data.error || !data.rates) {
+        throw new Error(`Open Exchange Rates error: ${data.description || data.message || 'no rates returned'}`);
+      }
+      return { ...data.rates, [data.base || 'USD']: 1 };
+    }
   }
 };
+
+// Resolve a stored provider id to a supported one
+function resolveProviderId(provider) {
+  return API_PROVIDERS[provider] ? provider : DEFAULT_PROVIDER;
+}
+
+// Move users whose stored provider was removed to the default provider
+async function migrateRemovedProvider() {
+  const { apiProvider } = await chrome.storage.sync.get(['apiProvider']);
+  if (apiProvider && !API_PROVIDERS[apiProvider]) {
+    await chrome.storage.sync.set({ apiProvider: DEFAULT_PROVIDER });
+    log(`🔀 Provider "${apiProvider}" is no longer available, switched to ${DEFAULT_PROVIDER}`);
+  }
+}
+
+// Rebase any rate table to "units per 1 USD" and drop invalid values
+function normalizeToUSD(rawRates) {
+  const usdRate = Number(rawRates && rawRates.USD);
+  if (!(usdRate > 0) || !isFinite(usdRate)) {
+    throw new Error('Provider response does not include a USD rate');
+  }
+
+  const rates = {};
+  Object.entries(rawRates).forEach(([code, value]) => {
+    const rate = Number(value) / usdRate;
+    if (/^[A-Z]{3,5}$/.test(code) && rate > 0 && isFinite(rate)) {
+      rates[code] = rate;
+    }
+  });
+  rates.USD = 1;
+  return rates;
+}
+
+// Fetch JSON and turn HTTP errors into readable messages
+async function fetchJson(url) {
+  const response = await fetch(url);
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (parseError) {
+    // Non-JSON response (HTML error page, redirect, etc.)
+  }
+
+  if (!response.ok) {
+    const detail = data && (data.error?.info || data.error?.message || data.description || data.message);
+    throw new Error(`API request failed: ${response.status}${detail ? ` - ${detail}` : ''}`);
+  }
+  if (!data) {
+    throw new Error('API returned an invalid (non-JSON) response');
+  }
+  return data;
+}
 
 // Fetch cryptocurrency rates from CoinGecko API
 async function fetchCryptoRates() {
@@ -573,14 +710,14 @@ async function updateExchangeRates(forceUpdate = false) {
   try {
     // Get user settings
     const settings = await chrome.storage.sync.get(['apiProvider', 'apiKey']);
-    let provider = settings.apiProvider || 'exchangerate-api';
-    const apiKey = settings.apiKey;
+    let provider = resolveProviderId(settings.apiProvider);
+    const apiKey = (settings.apiKey || '').trim();
 
     // Check if API requires key but none provided - auto-fallback to free API
     const providerInfo = API_PROVIDERS[provider];
-    if (providerInfo && providerInfo.requiresKey && !apiKey) {
+    if (providerInfo.requiresKey && !apiKey) {
       logWarn(`⚠️ ${providerInfo.name} requires an API key. Falling back to free API.`);
-      provider = 'exchangerate-api'; // Fallback to free API
+      provider = DEFAULT_PROVIDER; // Fallback to free API
 
       // Store the fallback info for user notification
       await chrome.storage.local.set({
@@ -594,124 +731,24 @@ async function updateExchangeRates(forceUpdate = false) {
       });
     }
 
-    let apiUrl;
-    let headers = {};
+    const activeProvider = API_PROVIDERS[provider];
+    const data = await fetchJson(activeProvider.buildUrl(apiKey));
 
-    // Choose API based on settings
-    switch (provider) {
-      case 'bank-of-israel':
-        // Use Bank of Israel rates for ILS accuracy
-        apiUrl = 'https://www.boi.org.il/currency.xml';
-        break;
-      case 'ecb':
-        // European Central Bank - reliable and free
-        apiUrl = 'https://api.exchangerate.host/latest?base=USD&source=ecb';
-        break;
-      case 'currencyapi':
-        // CurrencyAPI - good free tier
-        apiUrl = 'https://api.currencyapi.com/v3/latest?base_currency=USD';
-        break;
-      case 'exchangerates-api':
-        // Fast and reliable
-        apiUrl = 'https://api.exchangerates.host/latest?base=USD';
-        break;
-      case 'fixer':
-        if (!settings.apiKey) {
-          throw new Error('API key required for Fixer.io');
-        }
-        apiUrl = `https://api.fixer.io/latest?access_key=${settings.apiKey}`;
-        break;
-      case 'currencylayer':
-        if (!settings.apiKey) {
-          throw new Error('API key required for CurrencyLayer');
-        }
-        apiUrl = `https://api.currencylayer.com/live?access_key=${settings.apiKey}`;
-        break;
-      case 'openexchangerates':
-        if (!settings.apiKey) {
-          throw new Error('API key required for Open Exchange Rates');
-        }
-        apiUrl = `https://openexchangerates.org/api/latest.json?app_id=${settings.apiKey}`;
-        break;
-      case 'xe':
-        if (!settings.apiKey) {
-          throw new Error('API key required for XE Currency');
-        }
-        apiUrl = `https://api.xe.com/v1/convert_from.json/?from=USD&to=*&amount=1&key=${settings.apiKey}`;
-        break;
-      default: // exchangerate-api
-        apiUrl = 'https://api.exchangerate-api.com/v4/latest/USD';
-        break;
-    }
-
-    const response = await fetch(apiUrl, { headers });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    // Handle different API response formats
-    switch (provider) {
-      case 'bank-of-israel':
-        // Parse Bank of Israel SDMX format
-        exchangeRates = parseBankOfIsraelData(data);
-        break;
-      case 'ecb':
-      case 'exchangerates-api':
-        // Standard format with rates object
-        exchangeRates = data.rates || {};
-        break;
-      case 'currencyapi':
-        // CurrencyAPI format
-        exchangeRates = data.data || {};
-        break;
-      case 'currencylayer':
-        if (!data.success) {
-          throw new Error(data.error?.info || 'CurrencyLayer API error');
-        }
-        exchangeRates = data.quotes;
-        // Convert quotes format (USDUSD, USDEUR) to simple format
-        const convertedRates = {};
-        Object.keys(exchangeRates).forEach(key => {
-          const currency = key.substring(3); // Remove USD prefix
-          convertedRates[currency] = exchangeRates[key];
-        });
-        exchangeRates = convertedRates;
-        break;
-      case 'fixer':
-        if (!data.success) {
-          throw new Error(data.error?.info || 'Fixer.io API error');
-        }
-        exchangeRates = data.rates;
-        break;
-      case 'openexchangerates':
-        exchangeRates = data.rates || {};
-        break;
-      case 'xe':
-        // Parse XE format
-        exchangeRates = parseXEData(data);
-        break;
-      default:
-        // ExchangeRate-API format
-        exchangeRates = data.rates || {};
-        break;
-    }
-
-    exchangeRates['USD'] = 1; // Ensure USD is included as base
+    // Parse the provider-specific format (throws on API errors) and rebase to USD
+    const fiatRates = normalizeToUSD(activeProvider.parse(data));
 
     // Fetch cryptocurrency rates (BTC, ETH, etc.) from CoinGecko
     try {
       const cryptoRates = await fetchCryptoRates();
       // Merge crypto rates with fiat rates
-      Object.assign(exchangeRates, cryptoRates);
+      Object.assign(fiatRates, cryptoRates);
       log('✅ Successfully added cryptocurrency rates:', Object.keys(cryptoRates).join(', '));
     } catch (cryptoError) {
       logWarn('⚠️ Failed to fetch crypto rates:', cryptoError.message);
       // Continue with fiat rates only
     }
 
+    exchangeRates = fiatRates;
     lastUpdateTime = now;
 
     // Format last update time
@@ -789,37 +826,3 @@ function convertCurrency(amount, fromCurrency, toCurrency) {
     return null;
   }
 }
-
-// Parser functions for different API formats
-function parseBankOfIsraelData(data) {
-  // Simplified Bank of Israel parser - would need actual API structure
-  const rates = { USD: 1, ILS: 3.71 }; // Fallback rates
-  try {
-    // Parse SDMX format if available
-    if (data.dataSets && data.dataSets[0] && data.dataSets[0].series) {
-      // Process Bank of Israel specific format
-      log('Bank of Israel data format detected');
-    }
-  } catch (error) {
-    logError('Failed to parse Bank of Israel data:', error);
-  }
-  return rates;
-}
-
-function parseXEData(data) {
-  // Parse XE Currency API format
-  const rates = { USD: 1 };
-  try {
-    if (data.to) {
-      data.to.forEach(rate => {
-        rates[rate.quotecurrency] = rate.mid;
-      });
-    }
-  } catch (error) {
-    logError('Failed to parse XE data:', error);
-  }
-  return rates;
-}
-
-// Message listeners consolidated above (line 105)
-// This duplicate listener has been removed to prevent conflicts

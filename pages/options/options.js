@@ -107,7 +107,12 @@ async function loadSettings() {
     document.getElementById('highlightPrices').checked = settings.highlightPrices || false;
     document.getElementById('showInlineConversion').checked = settings.showInlineConversion !== undefined ? settings.showInlineConversion : true; // Native HTML title ON by default ⭐
     document.getElementById('replacePrice').checked = settings.replacePrice || false;
-    document.getElementById('apiProvider').value = settings.apiProvider || 'exchangerate-api';
+    const apiProviderSelect = document.getElementById('apiProvider');
+    apiProviderSelect.value = settings.apiProvider || 'exchangerate-api';
+    if (!apiProviderSelect.value) {
+      // Stored provider is no longer offered - fall back to the default
+      apiProviderSelect.value = 'exchangerate-api';
+    }
     document.getElementById('apiKey').value = settings.apiKey || '';
 
     // Popup visibility settings (all hidden by default)
@@ -631,10 +636,8 @@ function toggleApiKeyField() {
   // Define which providers need API keys
   const freeProviders = [
     'exchangerate-api',
-    'exchangerates-api',
     'ecb',
-    'bank-of-israel',
-    'currencyapi'
+    'bank-of-israel'
   ];
 
   const requiresKey = !freeProviders.includes(provider);
@@ -654,52 +657,50 @@ function updateApiKeyGuide(provider) {
   const guides = {
     'fixer': {
       name: 'Fixer.io',
-      free: false,
+      free: 'limited',
       steps: [
-        'Go to <a href="https://fixer.io/product" target="_blank">fixer.io/product</a>',
-        'Choose a paid plan (starting at $10/month)',
-        'Sign up and verify your email',
-        'Go to your Dashboard',
-        'Copy your API Access Key',
+        'Go to <a href="https://fixer.io/signup/free" target="_blank" rel="noopener">fixer.io/signup/free</a>',
+        'Sign up for the free plan (or a paid plan for more requests)',
+        'Verify your email',
+        'Copy your API Access Key from the dashboard',
         'Paste it in the field above'
       ],
-      note: '⚠️ This is a PAID service - no free tier available'
+      note: 'ℹ️ Free plan available with limited requests. Free-plan rates use EUR as the base and are rebased to USD automatically.'
     },
     'currencylayer': {
       name: 'CurrencyLayer',
-      free: false,
+      free: 'limited',
       steps: [
-        'Go to <a href="https://currencylayer.com/product" target="_blank">currencylayer.com/product</a>',
-        'Choose a paid plan (starting at $10/month)',
-        'Create an account',
+        'Go to <a href="https://currencylayer.com/signup/free" target="_blank" rel="noopener">currencylayer.com/signup/free</a>',
+        'Sign up for the free plan (or a paid plan for more requests)',
         'Verify your email',
-        'Find your Access Key in the dashboard',
+        'Copy your Access Key from the dashboard',
         'Paste it above'
       ],
-      note: '⚠️ This is a PAID service - no free tier available'
+      note: 'ℹ️ Free plan available with limited requests.'
     },
     'openexchangerates': {
       name: 'Open Exchange Rates',
       free: 'limited',
       steps: [
-        'Go to <a href="https://openexchangerates.org/signup/free" target="_blank">openexchangerates.org/signup/free</a>',
-        '✅ Choose the FREE plan (1000 requests/month)',
-        'Create your account',
-        'Verify your email',
+        'Go to <a href="https://openexchangerates.org/signup/free" target="_blank" rel="noopener">openexchangerates.org/signup/free</a>',
+        'Choose the free plan (1,000 requests/month)',
+        'Create your account and verify your email',
         'Copy your App ID from the dashboard',
         'Paste it above'
       ],
-      note: '✅ FREE tier available! 1000 requests per month is plenty for personal use'
+      note: 'ℹ️ Free plan available with limited requests (1,000/month) - plenty for personal use.'
     },
-    'xe': {
-      name: 'XE Currency Data',
-      free: false,
+    'currencyapi': {
+      name: 'CurrencyAPI',
+      free: 'limited',
       steps: [
-        'Go to <a href="https://www.xe.com/xecurrencydata/" target="_blank">xe.com/xecurrencydata</a>',
-        'Contact sales for enterprise pricing',
-        'This is an enterprise-only service'
+        'Go to <a href="https://app.currencyapi.com/register" target="_blank" rel="noopener">app.currencyapi.com/register</a>',
+        'Sign up for the free plan',
+        'Copy your API key from the dashboard',
+        'Paste it above'
       ],
-      note: '⚠️ Enterprise only - expensive, not recommended for personal use'
+      note: 'ℹ️ Free plan available with limited requests.'
     }
   };
 

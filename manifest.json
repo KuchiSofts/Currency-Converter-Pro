@@ -10,15 +10,13 @@
     "contextMenus"
   ],
   "host_permissions": [
-    "https://api.exchangerate-api.com/*",
-    "https://api.fixer.io/*",
-    "https://api.currencylayer.com/*",
-    "https://www.boi.org.il/*",
-    "https://api.exchangerate.host/*",
-    "https://api.currencyapi.com/*",
-    "https://api.exchangerates.host/*",
+    "https://open.er-api.com/*",
+    "https://api.frankfurter.dev/*",
+    "https://boi.org.il/*",
     "https://openexchangerates.org/*",
-    "https://api.xe.com/*",
+    "https://api.currencyapi.com/*",
+    "https://data.fixer.io/*",
+    "https://api.currencylayer.com/*",
     "https://api.coingecko.com/*"
   ],
   "background": {
