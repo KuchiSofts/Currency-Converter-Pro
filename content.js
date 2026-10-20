@@ -63,7 +63,9 @@ const {
 // Initial load message - only shows when DEBUG_MODE = true (will be set after settings load)
 log(`💱 Currency Converter Pro v${chrome.runtime.getManifest().version} initializing...`);
 
-let exchangeRates = { USD: 1, ILS: 3.7, EUR: 1.1, GBP: 0.8 };
+// Filled from the background script - no conversions are shown until real
+// rates have loaded (static guesses would be wrong, e.g. EUR per USD)
+let exchangeRates = {};
 let settings = {
   defaultTargetCurrency: 'ILS',
   highlightPrices: false,
@@ -521,7 +523,7 @@ async function loadRates() {
       }
     }
   } catch (e) {
-    log('⚠️ Using fallback rates:', e.message);
+    log('⚠️ Exchange rates unavailable, prices will not be converted:', e.message);
   }
 }
 
