@@ -4925,8 +4925,8 @@ function replaceSelectedText(data) {
       new RegExp(`[€£¥₹₪₽₩฿₺₣₱₫₴$]\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?`, 'g'),
       // Multi-char symbols
       new RegExp(`[CANZHSR]\\$\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?`, 'g'),
-      // Symbol after number
-      new RegExp(`(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?\\s*(?:zł|Kč|Ft|lei|kr)`, 'gi'),
+      // Symbol after number ("120 zł", "12,99 €")
+      new RegExp(`(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?\\s*(?:zł|Kč|Ft|lei|kr|[€£¥₹₪₽₩฿₺₣₱₫₴$])`, 'gi'),
       // Currency code with number
       new RegExp(`(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?\\s*(?:\\d{1,3}(?:[,.\\s]\\d{3})+|\\d+)(?:[.,]\\d{1,2})?\\s*(?:USD|EUR|GBP|JPY|INR|ILS|CAD|AUD|CHF|CNY|BRL|RUB|KRW|THB|TRY|ZAR|SEK|NOK|DKK|PLN|CZK|HUF|MXN|NZD|SGD|HKD|TWD|AED|SAR|PHP|VND|UAH|RON|ISK|KWD|QAR|EGP)?`, 'gi')
     ];
