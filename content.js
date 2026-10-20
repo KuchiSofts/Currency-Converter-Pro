@@ -1930,7 +1930,9 @@ function extractFragmentedPrice(element) {
   let combinedText = getAllText(element);
 
   // ⭐ SMART: Check if element already has a complete price
-  const hasCurrencySymbol = /[\$€£¥₹₪₽₩฿₺₣₱₫₴]|USD|EUR|GBP|ILS|JPY|CNY/.test(combinedText);
+  // Covers every supported symbol and code (e.g. "AED 50", "120 zł"), so a
+  // complete price is never mixed with unrelated numbers from the parent
+  const hasCurrencySymbol = (HAS_CURRENCY_REGEX || /[\$€£¥₹₪₽₩฿₺₣₱₫₴]|USD|EUR|GBP|ILS|JPY|CNY/).test(combinedText);
   const hasNumber = /\d/.test(combinedText);
   const hasCompletePrice = hasCurrencySymbol && hasNumber;
 
